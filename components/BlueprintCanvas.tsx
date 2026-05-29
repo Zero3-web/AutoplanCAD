@@ -146,6 +146,26 @@ const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ rooms, buildingWidth,
     setIsDragging(false);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isLocked) return;
+    const touch = e.touches[0];
+    setIsDragging(true);
+    setDragStart({ x: touch.clientX - offset.x, y: touch.clientY - offset.y });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isLocked) return;
+    const touch = e.touches[0];
+    setMousePos({ x: touch.clientX, y: touch.clientY });
+    if (isDragging) {
+      setOffset({ x: touch.clientX - dragStart.x, y: touch.clientY - dragStart.y });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
   const downloadSVG = () => {
     if (!svgRef.current) return;
     const svgData = new XMLSerializer().serializeToString(svgRef.current);
@@ -1028,6 +1048,10 @@ const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ rooms, buildingWidth,
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
       >
         {/* Vertical floating control bar on the left */}
         <div className="absolute top-1/2 left-6 -translate-y-1/2 z-[150] flex flex-col items-center gap-3 bg-white/95 backdrop-blur-md px-3 py-5 rounded-full shadow-2xl border border-gray-100">
