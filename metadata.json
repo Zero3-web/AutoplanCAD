@@ -1,0 +1,5 @@
+{
+  "name": "AutoPlan CAD",
+  "description": "A schematic floor plan generator creating AutoCAD-style SVG layouts based on user-defined office spaces. Generates layouts deterministically without AI.",
+  "requestFramePermissions": []
+}

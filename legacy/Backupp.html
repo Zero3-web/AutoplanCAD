@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Layout - Area Prime</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: transparent;
+            /* Match WordPress page background */
+            color: #333;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        #aprime-layout-wrapper {
+            width: 100%;
+            /* Force full viewport width even inside containers */
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            min-height: calc(100vh - 80px);
+            /* Account for WordPress nav bar */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: transparent;
+            /* Match WordPress page background */
+        }
+
+        /* Global Header Removed - Content moved to Step 1 */
+
+        #aprime-wizard-container {
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: visible;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            flex-grow: 1;
+            /* Fill available height */
+            justify-content: center;
+            /* Center content vertically */
+            max-width: 1600px;
+            /* Constraint for ultra-wide screens */
+            margin: 0 auto;
+            padding-bottom: 60px;
+            /* Space for footer scroll */
+        }
+
+        .wizard-header-strip {
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            width: fit-content;
+            min-width: 280px;
+            position: fixed;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .step-indicator {
+            font-weight: 700;
+            color: #1B35A0;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .wizard-progress {
+            background: #e0e0e0;
+            height: 6px;
+            width: 200px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .wizard-progress-bar {
+            background: #1B35A0;
+            height: 100%;
+            width: 20%;
+            transition: width 0.4s ease;
+        }
+
+        .wizard-step {
+            padding: 20px 40px;
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+            /* Center children horizontally */
+            text-align: center;
+            /* Center text */
+            animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            justify-content: center;
+        }
+
+        .wizard-step.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #1B35A0;
+            text-align: center;
+        }
+
+        .step-desc {
+            color: #777;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            /* 4 columns on wide screens */
+            gap: 25px;
+            width: 100%;
+        }
+
+        /* Medium screens: 3 columns */
+        @media (max-width: 1200px) {
+            .modules-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Small screens: 2 columns */
+        @media (max-width: 900px) {
+            .modules-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Step 4 (Bienestar): 5 items in one row */
+        #step-4 .modules-grid {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        /* Step 5 (Servicios): 5 items in one row */
+        #step-5 .modules-grid {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        /* Tablet: 3 columns */
+        @media (max-width: 1200px) {
+
+            #step-4 .modules-grid,
+            #step-5 .modules-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Small tablet: 2 columns */
+        @media (max-width: 900px) {
+
+            #step-4 .modules-grid,
+            #step-5 .modules-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Combined Mobile/Tablet Logic (Up to 900px) */
+        @media (max-width: 900px) {
+            #aprime-wizard-container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .modules-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                display: grid !important;
+                gap: 15px !important;
+            }
+
+            .wizard-step {
+                padding: 10px 0 !important;
+            }
+
+            .module-card {
+                padding: 15px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .module-icon {
+                height: 100px !important;
+                margin-bottom: 10px !important;
+            }
+
+            .module-title {
+                font-size: 0.9em !important;
+                min-height: auto !important;
+                align-items: flex-start !important;
+                margin-bottom: 5px !important;
+            }
+
+            /* Tooltips: Static Text below title */
+            .aprime-tooltip-text {
+                position: static !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                transform: none !important;
+                background: transparent !important;
+                color: #666 !important;
+                width: 100% !important;
+                padding: 0 !important;
+                text-align: left !important;
+                font-size: 0.75em !important;
+                box-shadow: none !important;
+                border: none !important;
+                pointer-events: auto !important;
+                display: block !important;
+                line-height: 1.3 !important;
+                min-height: 2.6em;
+                /* Reserve space for 2 lines */
+            }
+
+            .aprime-tooltip-text::after {
+                display: none !important;
+            }
+
+            /* HIDE Step Indicator ("1 de 5") */
+            .wizard-header-strip {
+                display: none !important;
+            }
+
+            /* Fix Results: Vertical Layout */
+            .results-layout-wrapper {
+                flex-direction: column !important;
+                height: auto !important;
+                gap: 20px !important;
+            }
+
+            .results-layout-wrapper>div {
+                width: 100% !important;
+                flex: none !important;
+                max-width: 100% !important;
+            }
+
+            .results-layout-wrapper>div:first-child {
+                height: 600px !important;
+                /* Increased height to show bottom controls */
+                margin-bottom: 60px;
+                /* Increased margin to prevent overlap with sidebar */
+            }
+
+            #results-sidebar {
+                padding: 15px !important;
+                /* Minimalist padding */
+                box-shadow: none !important;
+                /* Clean look */
+                background: transparent !important;
+                /* Remove card bg on mobile for cleaner look */
+                border: none !important;
+                margin-top: 40px !important;
+                /* Force separation from plan footer */
+            }
+
+            /* Minimalist Summary List on Mobile */
+            #spaces-list li {
+                padding: 8px 0 !important;
+                font-size: 0.85em !important;
+                border-bottom: 1px dashed #eee !important;
+            }
+
+            #spaces-list li span:last-child {
+                font-weight: 600 !important;
+            }
+
+            #step-6 {
+                height: auto !important;
+                padding-top: 20px !important;
+                /* Reduced top padding since nav is hidden */
+            }
+        }
+
+        /* HIDE Contact Section in Results GLOBALLY */
+        .global-hide-contact {
+            display: none;
+        }
+
+
+        .module-card {
+            border: none;
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-icon {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .module-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(27, 53, 160, 0.12);
+        }
+
+        .module-card.active-module {
+            box-shadow: 0 0 0 2px #1B35A0, 0 15px 35px rgba(27, 53, 160, 0.15);
+            background: #fff;
+        }
+
+
+
+        .module-title {
+            font-size: 0.75em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .module-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-circle {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f2f5;
+            color: #1B35A0;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            font-size: 1.2em;
+            padding: 0;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .btn-circle:hover {
+            background: #1B35A0;
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .module-val {
+            width: 40px;
+            text-align: center;
+            font-weight: 700;
+            border: none;
+            background: transparent;
+            font-size: 1.2em;
+            color: #333;
+            appearance: textfield;
+            -moz-appearance: textfield;
+        }
+
+        /* Hide Spinners */
+        .module-val::-webkit-outer-spin-button,
+        .module-val::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .wizard-footer {
+            padding: 20px 40px 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-nav {
+            padding: 12px 35px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s;
+        }
+
+        .btn-nav-prev {
+            background: #f0f0f0;
+            color: #777;
+        }
+
+        .btn-nav-next {
+            background: #1B35A0;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(27, 53, 160, 0.3);
+        }
+
+        .btn-nav-next:hover {
+            transform: translateY(-2px);
+            background: #162a8c;
+        }
+
+        .custom-error-msg {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+
+        /* Results Step */
+        .results-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .results-left {
+            flex: 2;
+            min-width: 400px;
+        }
+
+        .results-right {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        #svg-container {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+
+        #svg-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .result-display {
+            background: linear-gradient(135deg, #1B35A0, #2642bf);
+            color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-big-num {
+            font-size: 3em;
+            font-weight: 800;
+        }
+
+        .result-label {
+            opacity: 0.8;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-box .value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1B35A0;
+        }
+
+        .stat-box .label {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .room-list {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .room-list h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .room-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9em;
+        }
+
+        .room-item:last-child {
+            border-bottom: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-action {
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-regenerate {
+            background: #1B35A0;
+            color: #fff;
+        }
+
+        .btn-new {
+            background: #f0f0f0;
+            color: #555;
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        /* Skeleton UI Loader */
+        .skeleton-wrapper {
+            width: 100%;
+            height: 800px;
+            /* Match iframe height */
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+        }
+
+        .skeleton-block {
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-header {
+            height: 60px;
+            width: 100%;
+            display: flex;
+            gap: 15px;
+            padding: 10px;
+        }
+
+        .skeleton-btn {
+            width: 100px;
+            height: 100%;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .skeleton-canvas {
+            flex: 1;
+            width: 100%;
+        }
+
+        .skeleton-shimmer::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            transform: translateX(-100%);
+            background-image: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0,
+                    rgba(255, 255, 255, 0.4) 20%,
+                    rgba(255, 255, 255, 0.6) 60%,
+                    rgba(255, 255, 255, 0));
+            animation: skeleton-shimmer 2s infinite;
+        }
+
+        @keyframes skeleton-shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modules-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .results-container {
+                flex-direction: column;
+            }
+
+            .results-left,
+            .results-right {
+                min-width: 100%;
+            }
+        }
+
+        /* Tooltip Styles - FIXED z-index stacking */
+        .module-card {
+            position: relative !important;
+            overflow: visible !important;
+        }
+
+        /* Ensure card content stays above tooltip hover zone */
+        .module-icon,
+        .module-title,
+        .module-control {
+            position: relative;
+            z-index: 2;
+        }
+
+        .aprime-tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(30, 40, 55, 0.95);
+            color: #fff;
+            text-align: center;
+            border-radius: 10px;
+            padding: 12px 15px;
+            position: absolute;
+            z-index: 1;
+            bottom: calc(100% + 12px);
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            opacity: 0;
+            transition: all 0.25s ease;
+            font-size: 0.8em;
+            font-weight: 400;
+            line-height: 1.5;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .aprime-tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -8px;
+            border-width: 8px;
+            border-style: solid;
+            border-color: rgba(30, 40, 55, 0.95) transparent transparent transparent;
+        }
+
+        .module-card:hover .aprime-tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ============================================ */
+        /* HERO ENTRANCE ANIMATIONS                    */
+        /* ============================================ */
+
+        @keyframes heroFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes heroPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        .hero-title {
+            animation: heroFadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: 0.1s;
+            opacity: 0;
+        }
+
+        .hero-subtitle {
+            animation: heroFadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+
+        .hero-cta {
+            animation: heroFadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+
+        /* Minimalist CTA Button */
+        .btn-hero {
+            padding: 16px 45px;
+            font-size: 1em;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border-radius: 50px;
+            border: none;
+            background: #1B35A0;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: none;
+        }
+
+        .btn-hero:hover {
+            background: #2542B8;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(27, 53, 160, 0.25);
+        }
+
+        .btn-hero:active {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="aprime-layout-wrapper">
+        <!-- Main Header Removed - Content moved to Step 1 -->
+
+        <div id="aprime-wizard-container">
+            <div class="wizard-header-strip">
+                <span class="step-indicator">Paso <span id="wiz-step-num">1</span> de 5</span>
+                <div class="wizard-progress">
+                    <div class="wizard-progress-bar" id="wiz-progress"></div>
+                </div>
+            </div>
+
+            <!-- Step 1: Intro (Unified Hero - Centered with Animations) -->
+            <div class="wizard-step active" id="step-1">
+                <!-- Hero Content with Staggered Animations -->
+                <h1 class="hero-title"
+                    style="color: #1B35A0; font-size: 3.5em; font-weight: 800; margin-bottom: 20px; letter-spacing: -1px; line-height: 1.1;">
+                    Simulador de Layout
+                </h1>
+                <p class="hero-subtitle"
+                    style="font-size: 1.15em; color: #555; max-width: 550px; margin: 0 auto 45px auto; line-height: 1.7; font-weight: 400;">
+                    Arma tu oficina ideal bloque a bloque. Selecciona los espacios que necesitas y genera tu plano
+                    arquitectónico.
+                </p>
+
+                <button class="btn-hero hero-cta" id="btn-start">
+                    Comenzar →
+                </button>
+            </div>
+
+            <!-- Step 2: Espacios de Trabajo -->
+            <div class="wizard-step" id="step-2">
+                <h2>Espacios de Trabajo</h2>
+                <p class="step-desc">Define las áreas principales de tu equipo.</p>
+                <div class="modules-grid">
+                    <div class="module-card" data-room="pool_trabajo">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/pool_3d.jpg"
+                            class="module-icon">
+                        <div class="module-title">Pool de Trabajo</div>
+                        <div class="aprime-tooltip-text">Espacio abierto y flexible para el trabajo colaborativo.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('pool_trabajo', -1)">−</button>
+                            <input type="number" class="module-val" id="in_pool_trabajo" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('pool_trabajo', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="oficina_gerencia">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/gerencia_3d.jpg"
+                            class="module-icon">
+                        <div class="module-title">Oficina Gerencia</div>
+                        <div class="aprime-tooltip-text">Oficina privada ejecutiva para la alta dirección.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('oficina_gerencia', -1)">−</button>
+                            <input type="number" class="module-val" id="in_oficina_gerencia" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('oficina_gerencia', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="oficina_jefatura">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/jefatura_3d.jpg"
+                            class="module-icon">
+                        <div class="module-title">Oficina Jefatura</div>
+                        <div class="aprime-tooltip-text">Oficina privada para supervisión de equipos.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('oficina_jefatura', -1)">−</button>
+                            <input type="number" class="module-val" id="in_oficina_jefatura" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('oficina_jefatura', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="recepcion">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/recepcion_3d_1768091984218.jpg"
+                            class="module-icon">
+                        <div class="module-title">Recepción</div>
+                        <div class="aprime-tooltip-text">Área de bienvenida y control de acceso.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('recepcion', -1)">−</button>
+                            <input type="number" class="module-val" id="in_recepcion" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('recepcion', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="custom-error-msg" id="err-step-2">Debes agregar al menos un espacio de trabajo.</div>
+            </div>
+
+            <!-- Step 3: Reuniones -->
+            <div class="wizard-step" id="step-3">
+                <h2>Espacios de Reunión</h2>
+                <p class="step-desc">Espacios para colaborar y conectar.</p>
+                <div class="modules-grid">
+                    <div class="module-card" data-room="sala_reunion">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/sala_reunion_3d.jpg"
+                            class="module-icon">
+                        <div class="module-title">Sala Reunión</div>
+                        <div class="aprime-tooltip-text">Espacio equipado para juntas de 6-8 personas.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('sala_reunion', -1)">−</button>
+                            <input type="number" class="module-val" id="in_sala_reunion" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('sala_reunion', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="directorio">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/directorio_3d.jpg"
+                            class="module-icon">
+                        <div class="module-title">Directorio</div>
+                        <div class="aprime-tooltip-text">Sala ejecutiva para reuniones de alto nivel (10-12 pax).</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('directorio', -1)">−</button>
+                            <input type="number" class="module-val" id="in_directorio" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('directorio', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="meet_box">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/meet_box_3d_1768160026651.jpg"
+                            class="module-icon">
+                        <div class="module-title">Cabina Reunión</div>
+                        <div class="aprime-tooltip-text">Espacio compacto para videollamadas (2-4 pax).</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('meet_box', -1)">−</button>
+                            <input type="number" class="module-val" id="in_meet_box" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('meet_box', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="phone_booth">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/phone_booth_3d_1768160039525.jpg"
+                            class="module-icon">
+                        <div class="module-title">Cabina Telefónica</div>
+                        <div class="aprime-tooltip-text">Cabina insonorizada individual para llamadas.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('phone_booth', -1)">−</button>
+                            <input type="number" class="module-val" id="in_phone_booth" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('phone_booth', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Bienestar y Comodidades -->
+            <div class="wizard-step" id="step-4">
+                <h2>Bienestar y Comodidades</h2>
+                <p class="step-desc">Espacios de descanso y confort para tu equipo.</p>
+                <div class="modules-grid">
+                    <div class="module-card" data-room="kitchenette">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/kitchenette_3d_1768160051296.jpg"
+                            class="module-icon">
+                        <div class="module-title">Kitchenette</div>
+                        <div class="aprime-tooltip-text">Punto de café y refrigerios para el equipo.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('kitchenette', -1)">−</button>
+                            <input type="number" class="module-val" id="in_kitchenette" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('kitchenette', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="comedor">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/comedor_3d_1768160074900.jpg"
+                            class="module-icon">
+                        <div class="module-title">Comedor</div>
+                        <div class="aprime-tooltip-text">Área amplia para la alimentación del personal.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('comedor', -1)">−</button>
+                            <input type="number" class="module-val" id="in_comedor" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('comedor', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="sala_lounge">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/sala_lounge_3d_1768160088610.jpg"
+                            class="module-icon">
+                        <div class="module-title">Sala Lounge</div>
+                        <div class="aprime-tooltip-text">Espacio informal para descanso y socialización.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('sala_lounge', -1)">−</button>
+                            <input type="number" class="module-val" id="in_sala_lounge" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('sala_lounge', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="lactario">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/lactario_3d_1768160102590.jpg"
+                            class="module-icon">
+                        <div class="module-title">Lactario</div>
+                        <div class="aprime-tooltip-text">Sala privada acondicionada para madres lactantes.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('lactario', -1)">−</button>
+                            <input type="number" class="module-val" id="in_lactario" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('lactario', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="lockers">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/lockers_1768090425952.jpg"
+                            class="module-icon">
+                        <div class="module-title">Casilleros</div>
+                        <div class="aprime-tooltip-text">Módulos seguros para guardar pertenencias.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('lockers', -1)">−</button>
+                            <input type="number" class="module-val" id="in_lockers" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('lockers', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Servicios Operativos -->
+            <div class="wizard-step" id="step-5">
+                <h2>Servicios Operativos</h2>
+                <p class="step-desc">Instalaciones técnicas y de soporte.</p>
+                <div class="modules-grid">
+                    <div class="module-card" data-room="sshh_unitario">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/bagno_unitario_3d_1768160154552.jpg"
+                            class="module-icon">
+                        <div class="module-title">Baño Unitario</div>
+                        <div class="aprime-tooltip-text">Servicio higiénico individual independiente.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('sshh_unitario', -1)">−</button>
+                            <input type="number" class="module-val" id="in_sshh_unitario" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('sshh_unitario', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="sshh_multiple">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/bagno_multiple_3d_1768160141821.jpg"
+                            class="module-icon">
+                        <div class="module-title">Baño Múltiple</div>
+                        <div class="aprime-tooltip-text">Batería de baños compartidos por género.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('sshh_multiple', -1)">−</button>
+                            <input type="number" class="module-val" id="in_sshh_multiple" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('sshh_multiple', 1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="module-card" data-room="almacen">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/almacen_3d.jpg"
+                            class="module-icon">
+                        <div class="module-title">Almacén</div>
+                        <div class="aprime-tooltip-text">Espacio para archivo y suministros.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('almacen', -1)">−</button>
+                            <input type="number" class="module-val" id="in_almacen" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('almacen', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="datacenter">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/datacenter_3d_1768160181841.jpg"
+                            class="module-icon">
+                        <div class="module-title">Centro de Datos</div>
+                        <div class="aprime-tooltip-text">Sala climatizada para servidores y redes.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('datacenter', -1)">−</button>
+                            <input type="number" class="module-val" id="in_datacenter" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('datacenter', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="cuarto_limpieza">
+                        <img src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/cuarto_limpieza_3d_1768160195214.jpg"
+                            class="module-icon">
+                        <div class="module-title">Cuarto Limpieza</div>
+                        <div class="aprime-tooltip-text">Área de servicio y mantenimiento.</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('cuarto_limpieza', -1)">−</button>
+                            <input type="number" class="module-val" id="in_cuarto_limpieza" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('cuarto_limpieza', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="custom-error-msg" id="err-step-5">Debes agregar al menos un baño.</div>
+            </div>
+
+            <!-- Step 6: Results (Two-Column Layout) -->
+            <div class="wizard-step" id="step-6" style="align-items: stretch;">
+                <div class="results-layout-wrapper"
+                    style="display: flex; gap: 30px; width: 100%; max-width: 1400px; margin: 0 auto;">
+
+                    <!-- Left Column: Floor Plan (60%) -->
+                    <div style="flex: 0 0 60%; min-width: 0;">
+                        <div id="loading-state" class="loading-container" style="padding:0;">
+                            <div class="skeleton-wrapper">
+                                <div class="skeleton-header skeleton-shimmer">
+                                    <div class="skeleton-block skeleton-btn"></div>
+                                    <div class="skeleton-block skeleton-btn" style="width: 150px;"></div>
+                                    <div class="skeleton-block skeleton-btn" style="margin-left:auto;"></div>
+                                </div>
+                                <div class="skeleton-block skeleton-canvas skeleton-shimmer"></div>
+                            </div>
+                        </div>
+
+                        <div id="result-frame-container" style="display:none; width:100%; height:700px;">
+                            <iframe id="app-frame" allowfullscreen
+                                style="width:100%; height:100%; border:1px solid #ddd; border-radius:12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);"></iframe>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Additional Content (40%) -->
+                    <div id="results-sidebar"
+                        style="flex: 0 0 38%; padding: 25px; background: #fff; border-radius: 16px; border: 1px solid #e5e5e5; box-shadow: 0 4px 15px rgba(0,0,0,0.04);">
+
+                        <!-- Summary Section -->
+                        <h3 style="color: #1B35A0; margin-bottom: 15px; font-size: 1.1em; font-weight: 700;">
+                            📋 Resumen de Espacios
+                        </h3>
+                        <ul id="spaces-list" style="list-style: none; padding: 0; margin: 0;">
+                            <!-- Populated via JS -->
+                        </ul>
+
+                        <!-- Divider -->
+                        <div
+                            style="width: 100%; height: 1px; background: linear-gradient(to right, transparent, #ddd, transparent); margin: 25px 0;">
+                        </div>
+
+                        <!-- Contact Section (HIDDEN GLOBALLY AS REQUESTED) -->
+                        <div style="display: none;">
+                            <h3 style="color: #1B35A0; margin-bottom: 15px; font-size: 1.2em; font-weight: 700;">
+                                📞 ¿Necesitas ayuda?
+                            </h3>
+                            <p style="color: #666; font-size: 0.9em; line-height: 1.6; margin-bottom: 20px;">
+                                Nuestro equipo está listo para ayudarte a materializar tu oficina ideal.
+                            </p>
+                        </div>
+
+                        <div style="display: none; flex-direction: column; gap: 12px;">
+                            <a href="mailto:contacto@areaprime.com.pe"
+                                style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f5f7fa; border-radius: 10px; text-decoration: none; color: #333; transition: all 0.2s;">
+                                <span style="font-size: 1.2em;">✉️</span>
+                                <span style="font-size: 0.9em;">contacto@areaprime.com.pe</span>
+                            </a>
+                            <a href="tel:+5112345678"
+                                style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f5f7fa; border-radius: 10px; text-decoration: none; color: #333; transition: all 0.2s;">
+                                <span style="font-size: 1.2em;">📱</span>
+                                <span style="font-size: 0.9em;">+51 1 234 5678</span>
+                            </a>
+                            <a href="https://wa.me/51987654321" target="_blank"
+                                style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #25D366; border-radius: 10px; text-decoration: none; color: #fff; font-weight: 600; transition: all 0.2s;">
+                                <span style="font-size: 1.2em;">💬</span>
+                                <span style="font-size: 0.9em;">WhatsApp</span>
+                            </a>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="wizard-footer" id="wiz-footer" style="display:none;">
+                <button class="btn-nav btn-nav-prev" id="btn-prev">← Atrás</button>
+                <button class="btn-nav btn-nav-next" id="btn-next">Siguiente →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // ROOM TYPE MAPPING (Form Keys → API RoomTypes)
+        // ============================================
+        const ROOM_TYPE_MAP = {
+            'pool_trabajo': 'Pool de Trabajo',
+            'oficina_gerencia': 'Oficina Gerencia',
+            'oficina_jefatura': 'Oficina Jefatura',
+            'recepcion': 'Recepción',
+            'sala_reunion': 'Sala Reunión',
+            'directorio': 'Directorio',
+            'meet_box': 'Cabina Reunión',
+            'phone_booth': 'Cabina Telefónica',
+            'kitchenette': 'Kitchenette',
+            'comedor': 'Comedor',
+            'sala_lounge': 'Sala Lounge',
+            'lactario': 'Lactario',
+            'sshh_unitario': 'SS.HH',
+            'sshh_multiple': 'SS.HH',
+            'lockers': 'Casilleros',
+            'almacen': 'Almacén',
+            'datacenter': 'Centro de Datos',
+            'cuarto_limpieza': 'Cuarto Limpieza'
+        };
+
+        // ============================================
+        // STATE
+        // ============================================
+        let currentStep = 0;
+        const totalSteps = 6;
+        const inputs = {};
+
+        // Initialize all inputs to 0
+        Object.keys(ROOM_TYPE_MAP).forEach(key => { inputs[key] = 0; });
+
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        const btnStart = document.getElementById('btn-start');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const wizFooter = document.getElementById('wiz-footer');
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        btnStart.addEventListener('click', () => navigateStep(1));
+        btnPrev.addEventListener('click', () => navigateStep(-1));
+        btnNext.addEventListener('click', () => navigateStep(1));
+
+        // Input change listeners
+        document.querySelectorAll('.module-val').forEach(input => {
+            input.addEventListener('input', function () {
+                const key = this.id.replace('in_', '');
+                const val = Math.max(0, parseInt(this.value) || 0);
+                inputs[key] = val;
+                this.value = val;
+                updateCardState(key, val);
+            });
+        });
+
+        // ============================================
+        // FUNCTIONS
+        // ============================================
+        window.adjustVal = function (id, delta) {
+            const el = document.getElementById('in_' + id);
+            if (!el) return;
+            const newVal = Math.max(0, (parseInt(el.value) || 0) + delta);
+            el.value = newVal;
+            inputs[id] = newVal;
+            updateCardState(id, newVal);
+        };
+
+        function updateCardState(id, val) {
+            const card = document.querySelector(`[data-room="${id}"]`);
+            if (card) {
+                if (val > 0) {
+                    card.classList.add('active-module');
+                } else {
+                    card.classList.remove('active-module');
+                }
+            }
+        }
+
+        function navigateStep(direction) {
+            // Validate before moving forward
+            if (direction === 1 && !validateStep(currentStep)) return;
+
+            // If we're at step 5 going forward, generate layout
+            if (direction === 1 && currentStep === 4) {
+                currentStep++;
+                updateUI();
+                generateLayout();
+                return;
+            }
+
+            currentStep += direction;
+            if (currentStep < 0) currentStep = 0;
+            if (currentStep >= totalSteps) currentStep = totalSteps - 1;
+
+            // Auto-scroll to top on mobile when changing steps
+            if (window.innerWidth <= 900) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            updateUI();
+        }
+
+        function validateStep(step) {
+            const errEl = document.getElementById('err-step-' + (step + 1));
+            if (errEl) errEl.style.display = 'none';
+
+            if (step === 1) {
+                // Step 2: Must have reception (mandatory) and at least one workspace
+                if ((inputs.recepcion || 0) < 1) {
+                    if (errEl) {
+                        errEl.innerText = 'Debes agregar al menos 1 Recepción.';
+                        errEl.style.display = 'block';
+                    }
+                    return false;
+                }
+                const hasWorkspace = inputs.pool_trabajo > 0 ||
+                    inputs.oficina_gerencia > 0 ||
+                    inputs.oficina_jefatura > 0 ||
+                    inputs.recepcion > 0;
+                if (!hasWorkspace) {
+                    if (errEl) {
+                        errEl.innerText = 'Debes agregar al menos un espacio de trabajo.';
+                        errEl.style.display = 'block';
+                    }
+                    return false;
+                }
+            }
+
+            if (step === 4) {
+                // Step 5: Must have at least one bathroom
+                if ((inputs.sshh_unitario || 0) + (inputs.sshh_multiple || 0) <= 0) {
+                    if (errEl) errEl.style.display = 'block';
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function updateUI() {
+            // Update steps visibility
+            for (let i = 0; i < totalSteps; i++) {
+                const stepEl = document.getElementById('step-' + (i + 1));
+                if (stepEl) {
+                    stepEl.classList.remove('active');
+                    if (i === currentStep) stepEl.classList.add('active');
+                }
+            }
+
+            // Update progress
+            const pct = ((currentStep + 1) / totalSteps) * 100;
+            document.getElementById('wiz-progress').style.width = pct + '%';
+
+            // Step Logic: Nav Strip Visibility
+            const headerStrip = document.querySelector('.wizard-header-strip');
+
+            if (currentStep === 0) {
+                // Hide on Welcome/Hero Step
+                headerStrip.style.opacity = '0';
+                headerStrip.style.pointerEvents = 'none';
+                headerStrip.style.transform = 'translateX(-50%) translateY(-20px)';
+            } else if (currentStep === totalSteps - 1) {
+                // Hide on Results
+                headerStrip.style.opacity = '0';
+                headerStrip.style.pointerEvents = 'none';
+            } else {
+                // Show on Steps 2-5 (Input Steps)
+                headerStrip.style.opacity = '1';
+                headerStrip.style.pointerEvents = 'auto';
+                headerStrip.style.transform = 'translateX(-50%) translateY(0)';
+                document.getElementById('wiz-step-num').innerText = currentStep; // Step 1 internally = "Paso 1" displayed
+            }
+
+            // Update footer visibility (show on steps 1-4, hide on step 0 and step 5/results)
+            if (currentStep === 0 || currentStep === totalSteps - 1) {
+                wizFooter.style.display = 'none';
+            } else {
+                wizFooter.style.display = 'flex';
+            }
+
+            // Update next button text (show 'Generar' only on step 5 which is currentStep 4)
+            if (currentStep === 4) {
+                btnNext.innerText = 'Generar Plano Detallado';
+            } else {
+                btnNext.innerText = 'Siguiente →';
+            }
+        }
+
+        async function generateLayout() {
+            // Auto-scroll to top on mobile when generating layout
+            if (window.innerWidth <= 900) {
+                // Scroll immediately
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // And again after a short delay to ensure layout shift doesn't override it
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 300);
+            }
+
+            const loadingState = document.getElementById('loading-state');
+            const resultContainer = document.getElementById('result-frame-container');
+            const iframe = document.getElementById('app-frame');
+
+            loadingState.style.display = 'block';
+            if (resultContainer) resultContainer.style.display = 'none';
+
+            // Build rooms array for LocalStorage
+            // First, check if we have lockers to integrate into pool
+            const lockerCount = inputs['lockers'] || 0;
+
+            const rooms = [];
+            Object.keys(inputs).forEach(key => {
+                const count = inputs[key];
+                if (count > 0) {
+                    const roomType = ROOM_TYPE_MAP[key];
+                    if (key === 'pool_trabajo') {
+                        // Add lockers to the pool room if any
+                        rooms.push({
+                            type: roomType,
+                            capacity: count,
+                            hasLockers: lockerCount > 0,
+                            lockerCount: Math.ceil(lockerCount / 4) // Logic Update: 1 module per 4 pax
+                        });
+                    } else if (key === 'lockers') {
+                        // SKIP: Lockers are now integrated into pool_trabajo
+                        // Do nothing - handled above
+                    } else if (key === 'sshh_unitario') {
+                        // Input = number of PEOPLE, calculate bathrooms (1 per 10 people)
+                        const num = Math.ceil(count / 10);
+                        for (let i = 0; i < num; i++) {
+                            rooms.push({ type: roomType, sshhType: 'unitary' });
+                        }
+                    } else if (key === 'sshh_multiple') {
+                        // Input = number of PEOPLE, calculate bathrooms (1 per 20 people)
+                        const num = Math.ceil(count / 20);
+                        for (let i = 0; i < num; i++) {
+                            rooms.push({ type: roomType, sshhType: 'multiple' });
+                        }
+                    } else {
+                        for (let i = 0; i < count; i++) {
+                            rooms.push({ type: roomType });
+                        }
+                    }
+                }
+            });
+
+            // SAVE TO LOCAL STORAGE
+            const config = {
+                rooms: rooms,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('autoplan_config', JSON.stringify(config));
+
+            // POPULATE SPACES SUMMARY SIDEBAR
+            populateSpacesSummary();
+
+            // SHOW IFRAME INSTEAD OF REDIRECT
+            // Add a 2s delay to show the construction animation
+            setTimeout(() => {
+                loadingState.style.display = 'none';
+                if (resultContainer && iframe) {
+                    resultContainer.style.display = 'block';
+                    // URL de la App React Desplegada (Vercel)
+                    const deployedAppUrl = 'https://autoplan-cad3-fresh.vercel.app';
+
+                    // Force reload if already set to trigger re-read of localStorage
+                    // iframe.src = deployedAppUrl + '/?mode=iframe&t=' + Date.now();
+
+                    // CRITICAL FIX: Send configuration via PostMessage (Cross-Domain Support)
+                    // Define onload BEFORE setting src to ensure we don't miss the event
+                    iframe.onload = function () {
+                        console.log("Autoplan: iframe loaded, sending config via postMessage...");
+                        const msg = { type: 'AUTOPLAN_CONFIG', payload: config };
+
+                        // Send immediately and retry to ensure React App receives it
+                        iframe.contentWindow.postMessage(msg, '*');
+
+                        // Retry mechanism for React hydration delay
+                        setTimeout(() => {
+                            console.log("Autoplan: Retrying postMessage (1s)");
+                            try { iframe.contentWindow.postMessage(msg, '*'); } catch (e) { }
+                        }, 1000);
+                        setTimeout(() => {
+                            console.log("Autoplan: Retrying postMessage (3s)");
+                            try { iframe.contentWindow.postMessage(msg, '*'); } catch (e) { }
+                        }, 3000);
+                    };
+
+                    // Set src triggers loading
+                    console.log("Autoplan: Loading App from " + deployedAppUrl);
+                    iframe.src = deployedAppUrl + '/?mode=iframe&t=' + Date.now();
+                }
+            }, 1000);
+        }
+
+        /* TOOLTIP INJECTION */
+        function injectTooltips() {
+            const descriptions = {
+                'pool_trabajo': 'Espacio colaborativo abierto. Área: 4.5m² por persona. Incluye escritorio, silla y circulación. (Obligatorio)',
+                'oficina_gerencia': 'Oficina privada ejecutiva (12m²). Espacio para escritorio gerencial y mesa de reunión.',
+                'oficina_jefatura': 'Oficina privada de supervisión (10m²). Privacidad para mandos medios.',
+                'recepcion': 'Área de bienvenida y espera (15m²). Imagen corporativa obligatoria.',
+                'sala_reunion': 'Sala para juntas de equipo (2m² por persona). Mesa central y equipamiento.',
+                'directorio': 'Sala ejecutiva premium (4m² por persona). Para toma de decisiones y clientes.',
+                'sala_lounge': 'Espacio informal (3m² por persona). Para descanso, café y socialización.',
+                'meet_box': 'Cabina acústica rápida (1m² por persona). Reuniones 1 a 1 sin reserva.',
+                'phone_booth': 'Cabina individual privada (1.5m²). Para llamadas y videollamadas.',
+                'kitchenette': 'Área de preparación de café/comida (9m²). Punto de encuentro.',
+                'comedor': 'Espacio para almorzar (2m² por persona). Mesas y sillas de alto tráfico.',
+                'lactario': 'Sala privada para madres (7.5m²). Cumple normativa de ley.',
+                'lockers': 'Ingresa la cantidad de colaboradores. El sistema calcula automáticamente los módulos necesarios (Ej. 1 torre cada 4 personas).',
+                'almacen': 'Depósito de suministros (0.4m² por unidad). Archivo y logística.',
+                'sshh_multiple': 'Ingresa la cantidad de colaboradores. (Se calcula 1 unidad por cada 10 personas).',
+                'sshh_unitario': 'Ingresa la cantidad de colaboradores. (Se calcula 1 unidad por cada 10 personas).',
+                'datacenter': 'Cuarto de servidores climatizado (3m²). Seguridad de TI.',
+                'cuarto_limpieza': 'Área de mantenimiento (3m²). Lavadero y útiles.'
+            };
+
+            document.querySelectorAll('.module-card').forEach(card => {
+                if (card.querySelector('.aprime-tooltip')) return;
+                const input = card.querySelector('input');
+                if (!input || !input.id) return;
+                const key = input.id.replace('in_', '');
+                const text = descriptions[key];
+
+                if (text) {
+                    const tipText = document.createElement('span');
+                    tipText.className = 'aprime-tooltip-text';
+                    tipText.innerText = text;
+                    card.appendChild(tipText);
+                }
+            });
+        }
+
+        /* Initialize Tooltips after DOM ready */
+        // setTimeout(injectTooltips, 500); /* DISABLED: Tooltips are now in HTML */
+
+        // ============================================
+        // POPULATE SPACES SUMMARY FOR SIDEBAR
+        // ============================================
+        function populateSpacesSummary() {
+            const spacesList = document.getElementById('spaces-list');
+            if (!spacesList) return;
+
+            // Clear existing content
+            spacesList.innerHTML = '';
+
+            // Display names for each room type
+            const DISPLAY_NAMES = {
+                'pool_trabajo': 'Pool de Trabajo',
+                'oficina_gerencia': 'Oficina Gerencia',
+                'oficina_jefatura': 'Oficina Jefatura',
+                'recepcion': 'Recepción',
+                'sala_reunion': 'Sala de Reunión',
+                'directorio': 'Directorio',
+                'meet_box': 'Cabina Reunión',
+                'phone_booth': 'Cabina Telefónica',
+                'kitchenette': 'Kitchenette',
+                'comedor': 'Comedor',
+                'sala_lounge': 'Sala Lounge',
+                'lactario': 'Lactario',
+                'lockers': 'Casilleros',
+                'sshh_unitario': 'Baño Unitario',
+                'sshh_multiple': 'Baño Múltiple',
+                'almacen': 'Almacén',
+                'datacenter': 'Centro de Datos',
+                'cuarto_limpieza': 'Cuarto Limpieza'
+            };
+
+            let hasItems = false;
+            let totalSpaces = 0;
+
+            Object.keys(inputs).forEach(key => {
+                const count = inputs[key];
+                if (count > 0) {
+                    hasItems = true;
+                    totalSpaces += count;
+                    const displayName = DISPLAY_NAMES[key] || key;
+
+                    // Display correct count (Modules vs Pax)
+                    let displayCount = count;
+                    if (key === 'lockers') displayCount = Math.ceil(count / 4);
+                    if (key === 'sshh_unitario') displayCount = Math.ceil(count / 10);
+                    if (key === 'sshh_multiple') displayCount = Math.ceil(count / 20);
+
+                    const li = document.createElement('li');
+                    li.style.cssText = 'display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; color: #444;';
+                    li.innerHTML = `
+                        <span style="font-weight: 500;">${displayName}</span>
+                        <span style="background: #1B35A0; color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">${displayCount}</span>
+                    `;
+                    spacesList.appendChild(li);
+                }
+            });
+
+            // If no items, show message
+            if (!hasItems) {
+                const li = document.createElement('li');
+                li.style.cssText = 'padding: 10px 0; color: #888;';
+                li.textContent = 'No se seleccionaron espacios.';
+                spacesList.appendChild(li);
+            } else {
+                // Add total row
+                const totalLi = document.createElement('li');
+                totalLi.style.cssText = 'display: flex; justify-content: space-between; padding: 12px 0; margin-top: 10px; border-top: 2px solid #1B35A0; color: #1B35A0; font-weight: 700;';
+                totalLi.innerHTML = `
+                    <span>TOTAL ESPACIOS</span>
+                    <span>${totalSpaces}</span>
+                `;
+                spacesList.appendChild(totalLi);
+            }
+        }
+
+        // Initialize UI
+        updateUI();
+    </script>
+</body>
+
+</html>

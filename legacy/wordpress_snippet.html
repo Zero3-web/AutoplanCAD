@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Layout - Area Prime</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #aprime-layout-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .wizard-main-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .wizard-main-header h1 {
+            color: #1B35A0;
+            /* Primary Blue from brand */
+            font-size: 2.2em;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .wizard-main-header p {
+            color: #666;
+            font-size: 1.1em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #aprime-wizard-container {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wizard-header-strip {
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .step-indicator {
+            font-weight: 700;
+            color: #1B35A0;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .wizard-progress {
+            background: #e0e0e0;
+            height: 6px;
+            width: 200px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .wizard-progress-bar {
+            background: #1B35A0;
+            height: 100%;
+            width: 20%;
+            transition: width 0.4s ease;
+        }
+
+        .wizard-step {
+            padding: 40px;
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .wizard-step.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .step-desc {
+            color: #777;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            border: 2px solid #eee;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .module-card:hover {
+            border-color: #1B35A0;
+            box-shadow: 0 5px 15px rgba(27, 53, 160, 0.1);
+        }
+
+        .module-card.active-module {
+            border-color: #1B35A0;
+            background: #f8f9ff;
+        }
+
+        .module-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .module-title {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .module-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #1B35A0;
+            background: #fff;
+            color: #1B35A0;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            font-size: 1.2em;
+        }
+
+        .btn-circle:hover {
+            background: #1B35A0;
+            color: #fff;
+        }
+
+        .module-val {
+            width: 50px;
+            text-align: center;
+            font-weight: 700;
+            border: none;
+            background: transparent;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .wizard-footer {
+            padding: 20px 40px 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-nav {
+            padding: 12px 35px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s;
+        }
+
+        .btn-nav-prev {
+            background: #f0f0f0;
+            color: #777;
+        }
+
+        .btn-nav-next {
+            background: #1B35A0;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(27, 53, 160, 0.3);
+        }
+
+        .btn-nav-next:hover {
+            transform: translateY(-2px);
+            background: #162a8c;
+        }
+
+        .custom-error-msg {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+
+        /* Results Step */
+        .results-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .results-left {
+            flex: 2;
+            min-width: 400px;
+        }
+
+        .results-right {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        #svg-container {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+
+        #svg-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .result-display {
+            background: linear-gradient(135deg, #1B35A0, #2642bf);
+            color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-big-num {
+            font-size: 3em;
+            font-weight: 800;
+        }
+
+        .result-label {
+            opacity: 0.8;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-box .value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1B35A0;
+        }
+
+        .stat-box .label {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .room-list {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .room-list h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .room-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9em;
+        }
+
+        .room-item:last-child {
+            border-bottom: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-action {
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-regenerate {
+            background: #1B35A0;
+            color: #fff;
+        }
+
+        .btn-new {
+            background: #f0f0f0;
+            color: #555;
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #eee;
+            border-top-color: #1B35A0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modules-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .results-container {
+                flex-direction: column;
+            }
+
+            .results-left,
+            .results-right {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="aprime-layout-wrapper">
+        <div class="wizard-main-header">
+            <h1>Simulador de Layout</h1>
+            <p>Arma tu oficina ideal bloque a bloque. Selecciona los espacios que necesitas y genera tu plano
+                arquitectónico.</p>
+        </div>
+
+        <div id="aprime-wizard-container">
+            <div class="wizard-header-strip">
+                <span class="step-indicator">Paso <span id="wiz-step-num">1</span> de 5</span>
+                <div class="wizard-progress">
+                    <div class="wizard-progress-bar" id="wiz-progress"></div>
+                </div>
+            </div>
+
+            <!-- Step 1: Intro -->
+            <div class="wizard-step active" id="step-1">
+                <h2>Bienvenido</h2>
+                <p class="step-desc">Configura tu distribución ideal en simples pasos y genera un plano arquitectónico.
+                </p>
+                <div style="text-align:center; margin-top:40px;">
+                    <button class="btn-nav btn-nav-next" id="btn-start" style="padding: 15px 50px; font-size:1.1em;">
+                        🚀 COMENZAR
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Espacios de Trabajo -->
+            <div class="wizard-step" id="step-2">
+                <h2>Espacios de Trabajo</h2>
+                <p class="step-desc">Define las áreas principales de tu equipo.</p>
+                <div class="modules-grid">
+                    <div class="module-card" data-room="pool_trabajo">
+                        <div class="module-icon">👥</div>
+                        <div class="module-title">Pool de Trabajo</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('pool_trabajo', -1)">−</button>
+                            <input type="number" class="module-val" id="in_pool_trabajo" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('pool_trabajo', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="oficina_gerencia">
+                        <div class="module-icon">👔</div>
+                        <div class="module-title">Oficina Gerencia</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('oficina_gerencia', -1)">−</button>
+                            <input type="number" class="module-val" id="in_oficina_gerencia" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('oficina_gerencia', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="oficina_jefatura">
+                        <div class="module-icon">💼</div>
+                        <div class="module-title">Oficina Jefatura</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('oficina_jefatura', -1)">−</button>
+                            <input type="number" class="module-val" id="in_oficina_jefatura" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('oficina_jefatura', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="recepcion">
+                        <div class="module-icon">🛎️</div>
+                        <div class="module-title">Recepción</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('recepcion', -1)">−</button>
+                            <input type="number" class="module-val" id="in_recepcion" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('recepcion', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="custom-error-msg" id="err-step-2">Debes agregar al menos un espacio de trabajo.</div>
+            </div>
+
+            <!-- Step 3: Reuniones -->
+            <div class="wizard-step" id="step-3">
+                <h2>Espacios de Reunión</h2>
+                <p class="step-desc">Espacios para colaborar y conectar.</p>
+                <div class="modules-grid">
+                    <div class="module-card" data-room="sala_reunion">
+                        <div class="module-icon">🤝</div>
+                        <div class="module-title">Sala Reunión</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('sala_reunion', -1)">−</button>
+                            <input type="number" class="module-val" id="in_sala_reunion" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('sala_reunion', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="directorio">
+                        <div class="module-icon">📊</div>
+                        <div class="module-title">Directorio</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('directorio', -1)">−</button>
+                            <input type="number" class="module-val" id="in_directorio" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('directorio', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="meet_box">
+                        <div class="module-icon">📹</div>
+                        <div class="module-title">Cabina Reunión</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('meet_box', -1)">−</button>
+                            <input type="number" class="module-val" id="in_meet_box" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('meet_box', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="phone_booth">
+                        <div class="module-icon">📞</div>
+                        <div class="module-title">Cabina Telefónica</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('phone_booth', -1)">−</button>
+                            <input type="number" class="module-val" id="in_phone_booth" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('phone_booth', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Áreas Comunes y Soporte -->
+            <div class="wizard-step" id="step-4">
+                <h2>Áreas Comunes y Servicios</h2>
+                <p class="step-desc">Espacios de descanso y servicios técnicos.</p>
+                <div class="modules-grid">
+                    <div class="module-card" data-room="kitchenette">
+                        <div class="module-icon">☕</div>
+                        <div class="module-title">Kitchenette</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('kitchenette', -1)">−</button>
+                            <input type="number" class="module-val" id="in_kitchenette" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('kitchenette', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="comedor">
+                        <div class="module-icon">🍽️</div>
+                        <div class="module-title">Comedor</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('comedor', -1)">−</button>
+                            <input type="number" class="module-val" id="in_comedor" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('comedor', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="sala_lounge">
+                        <div class="module-icon">🛋️</div>
+                        <div class="module-title">Sala Lounge</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('sala_lounge', -1)">−</button>
+                            <input type="number" class="module-val" id="in_sala_lounge" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('sala_lounge', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="lactario">
+                        <div class="module-icon">🍼</div>
+                        <div class="module-title">Lactario</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('lactario', -1)">−</button>
+                            <input type="number" class="module-val" id="in_lactario" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('lactario', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="sshh_unitario">
+                        <div class="module-icon">🚻</div>
+                        <div class="module-title">Baño Unitario</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('sshh_unitario', -1)">−</button>
+                            <input type="number" class="module-val" id="in_sshh_unitario" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('sshh_unitario', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="sshh_multiple">
+                        <div class="module-icon">🚽</div>
+                        <div class="module-title">Baño Múltiple</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('sshh_multiple', -1)">−</button>
+                            <input type="number" class="module-val" id="in_sshh_multiple" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('sshh_multiple', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="lockers">
+                        <div class="module-icon">🔒</div>
+                        <div class="module-title">Casilleros</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('lockers', -1)">−</button>
+                            <input type="number" class="module-val" id="in_lockers" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('lockers', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="almacen">
+                        <div class="module-icon">📦</div>
+                        <div class="module-title">Almacén</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('almacen', -1)">−</button>
+                            <input type="number" class="module-val" id="in_almacen" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('almacen', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="datacenter">
+                        <div class="module-icon">🖥️</div>
+                        <div class="module-title">Centro de Datos</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('datacenter', -1)">−</button>
+                            <input type="number" class="module-val" id="in_datacenter" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('datacenter', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="module-card" data-room="cuarto_limpieza">
+                        <div class="module-icon">🧹</div>
+                        <div class="module-title">Cuarto Limpieza</div>
+                        <div class="module-control">
+                            <button class="btn-circle" onclick="adjustVal('cuarto_limpieza', -1)">−</button>
+                            <input type="number" class="module-val" id="in_cuarto_limpieza" value="0" min="0">
+                            <button class="btn-circle" onclick="adjustVal('cuarto_limpieza', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="custom-error-msg" id="err-step-4">Debes agregar al menos un baño.</div>
+            </div>
+
+            <!-- Step 5: Results -->
+            <div class="wizard-step" id="step-5">
+                <h2>Tu Plano Arquitectónico</h2>
+                <p class="step-desc">Aquí está la distribución optimizada de tu oficina.</p>
+
+                <div id="loading-state" class="loading-container">
+                    <div class="spinner"></div>
+                    <p>Configurando editor avanzado...</p>
+                    <p style="font-size:0.9em; color:#666; margin-top:10px;">Preparando vista previa...</p>
+                </div>
+
+                <div id="result-frame-container" style="display:none; width:100%; height:800px; padding-top:10px;">
+                    <iframe id="app-frame"
+                        style="width:100%; height:100%; border:1px solid #ddd; border-radius:12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);"></iframe>
+                </div>
+            </div>
+
+            <div class="wizard-footer" id="wiz-footer" style="display:none;">
+                <button class="btn-nav btn-nav-prev" id="btn-prev">← Atrás</button>
+                <button class="btn-nav btn-nav-next" id="btn-next">Siguiente →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // ROOM TYPE MAPPING (Form Keys → API RoomTypes)
+        // ============================================
+        const ROOM_TYPE_MAP = {
+            'pool_trabajo': 'Pool de Trabajo',
+            'oficina_gerencia': 'Oficina Gerencia',
+            'oficina_jefatura': 'Oficina Jefatura',
+            'recepcion': 'Recepción',
+            'sala_reunion': 'Sala Reunión',
+            'directorio': 'Directorio',
+            'meet_box': 'Cabina Reunión',
+            'phone_booth': 'Cabina Telefónica',
+            'kitchenette': 'Kitchenette',
+            'comedor': 'Comedor',
+            'sala_lounge': 'Sala Lounge',
+            'lactario': 'Lactario',
+            'sshh_unitario': 'SS.HH',
+            'sshh_multiple': 'SS.HH',
+            'lockers': 'Casilleros',
+            'almacen': 'Almacén',
+            'datacenter': 'Centro de Datos',
+            'cuarto_limpieza': 'Cuarto Limpieza'
+        };
+
+        // ============================================
+        // STATE
+        // ============================================
+        let currentStep = 0;
+        const totalSteps = 5;
+        const inputs = {};
+
+        // Initialize all inputs to 0
+        Object.keys(ROOM_TYPE_MAP).forEach(key => { inputs[key] = 0; });
+
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        const btnStart = document.getElementById('btn-start');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const wizFooter = document.getElementById('wiz-footer');
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        btnStart.addEventListener('click', () => navigateStep(1));
+        btnPrev.addEventListener('click', () => navigateStep(-1));
+        btnNext.addEventListener('click', () => navigateStep(1));
+
+        // Input change listeners
+        document.querySelectorAll('.module-val').forEach(input => {
+            input.addEventListener('input', function () {
+                const key = this.id.replace('in_', '');
+                const val = Math.max(0, parseInt(this.value) || 0);
+                inputs[key] = val;
+                this.value = val;
+                updateCardState(key, val);
+            });
+        });
+
+        // ============================================
+        // FUNCTIONS
+        // ============================================
+        window.adjustVal = function (id, delta) {
+            const el = document.getElementById('in_' + id);
+            if (!el) return;
+            const newVal = Math.max(0, (parseInt(el.value) || 0) + delta);
+            el.value = newVal;
+            inputs[id] = newVal;
+            updateCardState(id, newVal);
+        };
+
+        function updateCardState(id, val) {
+            const card = document.querySelector(`[data-room="${id}"]`);
+            if (card) {
+                if (val > 0) {
+                    card.classList.add('active-module');
+                } else {
+                    card.classList.remove('active-module');
+                }
+            }
+        }
+
+        function navigateStep(direction) {
+            // Validate before moving forward
+            if (direction === 1 && !validateStep(currentStep)) return;
+
+            // If we're at step 4 going forward, generate layout
+            if (direction === 1 && currentStep === 3) {
+                currentStep++;
+                updateUI();
+                generateLayout();
+                return;
+            }
+
+            currentStep += direction;
+            if (currentStep < 0) currentStep = 0;
+            if (currentStep >= totalSteps) currentStep = totalSteps - 1;
+            updateUI();
+        }
+
+        function validateStep(step) {
+            const errEl = document.getElementById('err-step-' + (step + 1));
+            if (errEl) errEl.style.display = 'none';
+
+            if (step === 1) {
+                // Step 2: Must have at least one workspace
+                const hasWorkspace = inputs.pool_trabajo > 0 ||
+                    inputs.oficina_gerencia > 0 ||
+                    inputs.oficina_jefatura > 0 ||
+                    inputs.recepcion > 0;
+                if (!hasWorkspace) {
+                    if (errEl) errEl.style.display = 'block';
+                    return false;
+                }
+            }
+
+            if (step === 3) {
+                // Step 4: Must have at least one bathroom
+                if ((inputs.sshh_unitario || 0) + (inputs.sshh_multiple || 0) <= 0) {
+                    if (errEl) errEl.style.display = 'block';
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function updateUI() {
+            // Update steps visibility
+            for (let i = 0; i < totalSteps; i++) {
+                const stepEl = document.getElementById('step-' + (i + 1));
+                if (stepEl) {
+                    stepEl.classList.remove('active');
+                    if (i === currentStep) stepEl.classList.add('active');
+                }
+            }
+
+            // Update progress
+            const pct = ((currentStep + 1) / totalSteps) * 100;
+            document.getElementById('wiz-progress').style.width = pct + '%';
+            document.getElementById('wiz-step-num').innerText = currentStep + 1;
+
+            // Update footer visibility
+            if (currentStep === 0 || currentStep === totalSteps - 1) {
+                wizFooter.style.display = 'none';
+            } else {
+                wizFooter.style.display = 'flex';
+            }
+
+            // Update next button text
+            if (currentStep === 3) {
+                btnNext.innerText = '🎨 Generar Plano Detallado';
+            } else {
+                btnNext.innerText = 'Siguiente →';
+            }
+        }
+
+        async function generateLayout() {
+            const loadingState = document.getElementById('loading-state');
+            const resultContainer = document.getElementById('result-frame-container');
+            const iframe = document.getElementById('app-frame');
+
+            loadingState.style.display = 'block';
+            if (resultContainer) resultContainer.style.display = 'none';
+
+            // Build rooms array for LocalStorage
+            const rooms = [];
+            Object.keys(inputs).forEach(key => {
+                const count = inputs[key];
+                if (count > 0) {
+                    const roomType = ROOM_TYPE_MAP[key];
+                    if (key === 'pool_trabajo') {
+                        rooms.push({
+                            type: roomType,
+                            capacity: count
+                        });
+                    } else if (key === 'lockers') {
+                        // Grouped Lockers: input = quantity of lockers
+                        rooms.push({
+                            type: roomType,
+                            capacity: count
+                        });
+                    } else if (key === 'sshh_unitario') {
+                        // Grouped Unitary: input = quantity of toilets
+                        // Multiply by 10 because Renderer assumes 1 toilet per 10 pax
+                        rooms.push({
+                            type: roomType,
+                            sshhType: 'unitary',
+                            capacity: count * 10
+                        });
+                    } else if (key === 'sshh_multiple') {
+                        for (let i = 0; i < count; i++) {
+                            rooms.push({ type: roomType, sshhType: 'multiple' });
+                        }
+                    } else {
+                        for (let i = 0; i < count; i++) {
+                            rooms.push({ type: roomType });
+                        }
+                    }
+                }
+            });
+
+            // SAVE TO LOCAL STORAGE
+            const config = {
+                rooms: rooms,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('autoplan_config', JSON.stringify(config));
+
+            // SHOW IFRAME INSTEAD OF REDIRECT
+            setTimeout(() => {
+                loadingState.style.display = 'none';
+                if (resultContainer && iframe) {
+                    resultContainer.style.display = 'block';
+                    // IMPORTANTE: Reemplaza 'YOUR_DEPLOYED_REACT_APP_URL' con la URL real de tu app (ej: https://mi-app.vercel.app)
+                    const deployedAppUrl = 'YOUR_DEPLOYED_REACT_APP_URL';
+
+                    if (deployedAppUrl === 'YOUR_DEPLOYED_REACT_APP_URL' || deployedAppUrl === '') {
+                        loadingState.style.display = 'none';
+                        if (resultContainer) {
+                            resultContainer.style.display = 'block';
+                            resultContainer.innerHTML = `
+                                <div style="padding:40px; text-align:center; background:#fff3cd; border:1px solid #ffeeba; color:#856404; border-radius:8px;">
+                                    <h3>⚠️ Configuración Pendiente</h3>
+                                    <p>Para ver el simulador, necesitas especificar la URL de tu aplicación.</p>
+                                    <p style="font-size:0.9em; margin-top:10px;">Edita este código HTML y busca la línea: <code>const deployedAppUrl = ...</code></p>
+                                </div>
+                            `;
+                        }
+                        return;
+                    }
+
+                    // Force reload if already set to trigger re-read of localStorage
+                    iframe.src = deployedAppUrl + '/?mode=iframe&t=' + Date.now();
+                }
+            }, 1000);
+        }
+
+        // Initialize UI
+        updateUI();
+    </script>
+</body>
+
+</html>

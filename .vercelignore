@@ -1,0 +1,11 @@
+geometry_engine/
+api/
+requirements.txt
+.python-version
+test_*.py
+server.ts
+legacy/
+backup.html
+test_results.json
+test_output.txt
+metadata.json

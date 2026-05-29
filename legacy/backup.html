@@ -1,0 +1,2233 @@
+<style>
+    /* Global resets & typography (Copied from V4) */
+    #aprime-layout-wrapper {
+        font-family: 'Montserrat', sans-serif;
+        color: #333;
+        max-width: 900px;
+        margin: 0 auto;
+        padding-bottom: 50px;
+    }
+
+    /* Header Section */
+    .wizard-main-header {
+        text-align: center;
+        padding: 20px 20px 30px;
+    }
+
+    .wizard-main-header h1 {
+        color: #1B35A0;
+        font-weight: 800;
+        font-size: 2.5em;
+        margin-bottom: 15px;
+        line-height: 1.2;
+    }
+
+    .wizard-main-header p {
+        color: #666;
+        font-size: 1.1em;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* Wizard Container */
+    #aprime-wizard-container {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        position: relative;
+        padding: 0;
+        min-height: 600px;
+    }
+
+    /* Progress Bar */
+    .wizard-header-strip {
+        background: #fdfdfd;
+        padding: 20px 40px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .wizard-progress {
+        height: 8px;
+        background: #eef1f5;
+        border-radius: 4px;
+        width: 200px;
+        overflow: hidden;
+    }
+
+    .wizard-progress-bar {
+        height: 100%;
+        background: #1B35A0;
+        width: 0%;
+        transition: width 0.4s ease;
+        border-radius: 4px;
+    }
+
+    .step-indicator {
+        font-size: 0.9em;
+        color: #888;
+        font-weight: 600;
+    }
+
+    /* Steps */
+    .wizard-step {
+        display: none;
+        padding: 40px 40px;
+        /* Reduced side padding for grid */
+        animation: slideInUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    @keyframes slideInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .wizard-step.active {
+        display: block;
+    }
+
+    .wizard-step h2 {
+        color: #1B35A0;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 1.8em;
+    }
+
+    .wizard-step .step-desc {
+        text-align: center;
+        color: #000;
+        margin-bottom: 30px;
+        font-size: 1em;
+        opacity: 0.7;
+    }
+
+    /* Grid for Layout Modules */
+    .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 25px;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+
+    /* Module Card */
+    .module-card {
+        background: #fff;
+        border: 1px solid #eee;
+        /* Light border for definition */
+        border-radius: 15px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.2s;
+        position: relative;
+    }
+
+    .module-card:hover {
+        border-color: #1B35A0;
+        box-shadow: 0 5px 15px rgba(27, 53, 160, 0.1);
+    }
+
+    .module-card.active-module {
+        border-color: #1B35A0;
+        background: #fcfcff;
+    }
+
+    .module-icon {
+        height: 80px;
+        width: auto;
+        display: block;
+        margin: 0 auto 10px;
+        object-fit: contain;
+    }
+
+    .module-title {
+        font-size: 0.95em;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 5px;
+        min-height: 40px;
+        /* Align titles */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Counter Control within Card */
+    .module-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        /* Reduced gap */
+        margin-top: 10px;
+    }
+
+    .btn-circle {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        /* Ensure it doesn't shrink */
+        flex-shrink: 0;
+        /* Prevent flex shrinking */
+        border-radius: 50%;
+        border: 1px solid #1B35A0;
+        background: #fff;
+        color: #1B35A0;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+    }
+
+    .btn-circle:hover {
+        background: #1B35A0;
+        color: #fff;
+    }
+
+    .module-val {
+        width: 35px !important;
+        max-width: 35px !important;
+        min-width: 35px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: inline-block !important;
+        text-align: center;
+        font-weight: 700;
+        border: none !important;
+        background: transparent !important;
+        font-size: 1.1em;
+        line-height: normal !important;
+        outline: none;
+        color: #333;
+        appearance: textfield;
+        -moz-appearance: textfield;
+    }
+
+    .module-val:focus {
+        background: #f0f4ff;
+        border-radius: 4px;
+        color: #1B35A0;
+    }
+
+    /* Hide Spinners */
+    .module-val::-webkit-outer-spin-button,
+    .module-val::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Form Styles */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .form-input-field {
+        width: 100%;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1em;
+        font-family: inherit;
+        background: #fafafa;
+    }
+
+    /* Results */
+    .result-display {
+        text-align: center;
+        background: radial-gradient(circle at center, #2642bf 0%, #1B35A0 100%);
+        color: #fff;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+    }
+
+    .result-big-num {
+        font-size: 4em;
+        font-weight: 800;
+        line-height: 1;
+        margin: 10px 0;
+        text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .result-label {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.8;
+        font-size: 0.9em;
+    }
+
+    .result-row {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+    }
+
+    .result-item {
+        text-align: center;
+    }
+
+    .result-item small {
+        display: block;
+        opacity: 0.7;
+        font-size: 0.8em;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .result-item strong {
+        font-size: 1.5em;
+        font-weight: 700;
+    }
+
+    /* Navigation */
+    .wizard-footer {
+        padding: 20px 60px 40px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btn-nav {
+        padding: 12px 35px;
+        border-radius: 30px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 1em;
+        transition: transform 0.2s;
+    }
+
+    .btn-nav-prev {
+        background: #f0f0f0;
+        color: #777;
+    }
+
+    .btn-nav-next {
+        background: #1B35A0;
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(27, 53, 160, 0.3);
+    }
+
+    .btn-nav-next:hover {
+        transform: translateY(-2px);
+        background: #162a8c;
+    }
+
+    .custom-error-msg {
+        color: #e74c3c;
+        font-size: 0.9em;
+        margin-top: 10px;
+        display: none;
+        text-align: center;
+    }
+
+    #hidden-cf7-container {
+        display: none;
+    }
+
+    @media (max-width: 600px) {
+        .modules-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .wizard-main-header h1 {
+            font-size: 1.8em;
+        }
+
+        .wizard-step {
+            padding: 30px 20px;
+        }
+
+        /* Mobile Header Strip Fixes */
+        .wizard-header-strip {
+            padding: 15px 20px;
+            flex-direction: column;
+            /* Stack indicator and progress bar */
+            gap: 10px;
+            align-items: stretch;
+            text-align: center;
+        }
+
+        .step-indicator {
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .wizard-progress {
+            width: 100%;
+            /* Full width progress bar */
+        }
+
+        /* Mobile Footer Buttons (Stacking) */
+        .wizard-footer {
+            padding: 20px 20px 30px;
+            flex-direction: column-reverse;
+            /* Stack buttons, Next on top usually or use gap */
+            gap: 15px;
+        }
+
+        .btn-nav {
+            width: 100%;
+            /* Full width buttons */
+            padding: 15px;
+            /* Tappable area */
+            font-size: 1em;
+        }
+
+        /* Adjust Typography */
+        .wizard-step h2 {
+            font-size: 1.5em;
+            /* Smaller titles */
+            margin-bottom: 15px;
+        }
+
+        .wizard-step .step-desc {
+            font-size: 0.9em;
+            margin-bottom: 25px;
+        }
+
+        /* Form Inputs */
+        .form-input-field {
+            font-size: 16px;
+            /* Prevent IOS zoom */
+            padding: 12px;
+        }
+    }
+
+    /* TOOLTIP STYLES - Floating Above */
+    .module-card {
+        position: relative !important;
+        overflow: visible !important;
+    }
+
+    .aprime-tooltip-text {
+        visibility: hidden;
+        width: 180px;
+        background-color: #2c3e50;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 8px 12px;
+        position: absolute;
+        z-index: 1000;
+        bottom: 105%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-size: 0.8em;
+        font-weight: normal;
+        line-height: 1.4;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+    }
+
+    .aprime-tooltip-text::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -6px;
+        border-width: 6px;
+        border-style: solid;
+        border-color: #2c3e50 transparent transparent transparent;
+    }
+
+    .module-card:hover .aprime-tooltip-text {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* AI SECTION STYLES */
+    #ai-floorplan-section {
+        margin-top: 30px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+    }
+
+    #ai-prompt-box {
+        width: 100%;
+        max-width: 600px;
+        margin: 15px auto;
+        padding: 15px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 0.85em;
+        color: #555;
+        white-space: pre-wrap;
+        text-align: left;
+        display: none;
+    }
+
+    /* AI Loading Animation (Construction) */
+    #ai-construction-anim {
+        position: relative;
+        width: 100%;
+        height: 250px;
+        background: #fdfdfd;
+        border-radius: 12px;
+        display: none;
+        /* Hidden by default */
+        overflow: hidden;
+        border: 1px dashed #e0e0e0;
+        margin-top: 20px;
+    }
+
+    .const-icon {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        z-index: 10;
+        border: 2px solid #fff;
+    }
+
+    @keyframes construct {
+        0% {
+            opacity: 0;
+            transform: translate(100px, -100px) rotate(45deg) scale(0.8);
+        }
+
+        20% {
+            opacity: 1;
+            transform: translate(0, 0) rotate(0) scale(1.1);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translate(0, 0) rotate(0) scale(1);
+        }
+    }
+
+    #ai-action-buttons {
+        display: none;
+        /* Flex when active */
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 12px 24px;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95em;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-regen {
+        background: #1B35A0;
+        /* Blue */
+        color: white;
+        box-shadow: 0 4px 15px rgba(27, 53, 160, 0.3);
+    }
+
+    .btn-reset {
+        background: #f1f2f6;
+        color: #555;
+        border: 1px solid #ddd;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    /* AI Generation Button (Enhanced) */
+    .ai-btn-gen {
+        background: linear-gradient(135deg, #1B35A0 0%, #162a8c 100%);
+        color: white;
+        border: none;
+        padding: 14px 35px;
+        border-radius: 50px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 1.1em;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(27, 53, 160, 0.3);
+        margin-top: 10px;
+    }
+
+    .ai-btn-gen:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(27, 53, 160, 0.5);
+        background: linear-gradient(135deg, #2442c5 0%, #1B35A0 100%);
+    }
+
+    .ai-loading {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin: 20px 0;
+        color: #7f8c8d;
+    }
+
+    .ai-spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #eee;
+        border-top-color: #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Style Selector Options */
+    .style-opt {
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.9em;
+        color: #666;
+        transition: all 0.2s;
+        background: #fff;
+    }
+
+    .style-opt:hover {
+        border-color: #1B35A0;
+        color: #1B35A0;
+        transform: translateY(-1px);
+    }
+
+    .style-opt.selected {
+        background: #1B35A0;
+        color: #fff;
+        border-color: #1B35A0;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(27, 53, 160, 0.2);
+    }
+
+    #ai-image-result {
+        margin-top: 20px;
+        width: 100%;
+        max-width: 600px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .wizard-step {
+            padding: 20px;
+        }
+
+        .modules-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+
+<div id="aprime-layout-wrapper">
+    <div class="wizard-main-header">
+        <h1>Simulador de Layout</h1>
+        <p>Arma tu oficina ideal bloque a bloque. Selecciona los espacios que necesitas y obtén un estimado de área y
+            presupuesto.</p>
+    </div>
+    <div id="aprime-wizard-container">
+        <div class="wizard-header-strip"><span class="step-indicator">Paso <span id="wiz-step-num">1</span>de 7</span>
+            <div class="wizard-progress">
+                <div class="wizard-progress-bar" id="wiz-progress"></div>
+            </div>
+        </div>
+        <!-- Step 1: Intro -- REMOVED ACTIVE CLASS TO PREVENT FLASH -->
+        <div class="wizard-step" id="step-1">
+            <h2>Bienvenido</h2>
+            <p class="step-desc">Configura tu distribución ideal en simples pasos.</p>
+            <div style="text-align:center; margin-top:40px;"><button class="btn-nav btn-nav-next" id="btn-start-intro"
+                    style="padding: 15px 50px; font-size:1.1em;">COMENZAR</button></div>
+        </div>
+        <!-- Step 2: Workspace -->
+        <div class="wizard-step" id="step-2">
+            <h2>Espacios de Trabajo</h2>
+            <p class="step-desc">Define las áreas principales de tu equipo.</p>
+            <div class="modules-grid">
+                <!-- Pool -->
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/pool_3d.jpg"
+                        class="module-icon">
+                    <div class="module-title">Colaboradores - Pool de Trabajo</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('pool_trabajo', -1)">-</button><input type="number" min="0"
+                            id="in_pool_trabajo" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('pool_trabajo', 1)">+</button></div>
+                </div>
+                <!-- Gerencia -->
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/gerencia_3d.jpg"
+                        class="module-icon">
+                    <div class="module-title">Oficina Gerencia</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('oficina_gerencia', -1)">-</button><input type="number" min="0"
+                            id="in_oficina_gerencia" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('oficina_gerencia', 1)">+</button>
+                    </div>
+                </div>
+                <!-- Jefatura -->
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/jefatura_3d.jpg"
+                        class="module-icon">
+                    <div class="module-title">Oficina Jefatura</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('oficina_jefatura', -1)">-</button><input type="number" min="0"
+                            id="in_oficina_jefatura" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('oficina_jefatura', 1)">+</button></div>
+                </div>
+            </div>
+            <div class="custom-error-msg" id="err-step-2">El Pool de Trabajo es requerido.</div>
+        </div>
+        <!-- Step 3: Meetings -->
+        <div class="wizard-step" id="step-3">
+            <h2>Reuniones</h2>
+            <p class="step-desc">Espacios para colaborar y conectar.</p>
+            <div class="modules-grid">
+                <!-- Sala Reunion -->
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/sala_reunion_3d.jpg"
+                        class="module-icon" style="filter: grayscale(0.5);">
+                    <div class="module-title">Sala Reunión</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('sala_reunion', -1)">-</button><input type="number" min="0"
+                            id="in_sala_reunion" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('sala_reunion', 1)">+</button>
+                    </div>
+                </div>
+                <!-- Directorio -->
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/directorio_3d.jpg"
+                        class="module-icon">
+                    <div class="module-title">Directorio</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('directorio', -1)">-</button><input type="number" min="0"
+                            id="in_directorio" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('directorio', 1)">+</button>
+                    </div>
+                </div>
+                <!-- Meet Box -->
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/meet_box_3d_1768160026651.jpg"
+                        class="module-icon">
+                    <div class="module-title">Meet Box</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('meet_box', -1)">-</button><input type="number" min="0"
+                            id="in_meet_box" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('meet_box', 1)">+</button>
+                    </div>
+                </div>
+                <!-- Phone Booth -->
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/phone_booth_3d_1768160039525.jpg"
+                        class="module-icon">
+                    <div class="module-title">Phone Booth</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('phone_booth', -1)">-</button><input type="number" min="0"
+                            id="in_phone_booth" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('phone_booth', 1)">+</button></div>
+                </div>
+            </div>
+        </div>
+        <!-- Step 4: Common Areas -->
+        <div class="wizard-step" id="step-4">
+            <h2>Áreas Comunes</h2>
+            <p class="step-desc">Espacios de pausa y servicios para el equipo.</p>
+            <div class="modules-grid">
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/kitchenette_3d_1768160051296.jpg"
+                        class="module-icon">
+                    <div class="module-title">Kitchenette</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('kitchenette', -1)">-</button><input type="number" min="0"
+                            id="in_kitchenette" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('kitchenette', 1)">+</button></div>
+                </div>
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/comedor_3d_1768160074900.jpg"
+                        class="module-icon">
+                    <div class="module-title">Comedor</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('comedor', -1)">-</button><input type="number" min="0" id="in_comedor"
+                            class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('comedor', 1)">+</button></div>
+                </div>
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/sala_lounge_3d_1768160088610.jpg"
+                        class="module-icon">
+                    <div class="module-title">Sala Lounge</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('sala_lounge', -1)">-</button><input type="number" min="0"
+                            id="in_sala_lounge" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('sala_lounge', 1)">+</button></div>
+                </div>
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/lactario_3d_1768160102590.jpg"
+                        class="module-icon">
+                    <div class="module-title">Lactario</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('lactario', -1)">-</button><input type="number" min="0"
+                            id="in_lactario" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('lactario', 1)">+</button></div>
+                </div>
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/recepcion_3d_1768091984218.jpg"
+                        class="module-icon">
+                    <div class="module-title">Recepción</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('recepcion', -1)">-</button><input type="number" min="0"
+                            id="in_recepcion" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('recepcion', 1)">+</button></div>
+                </div>
+            </div>
+            <div class="custom-error-msg" id="err-step-4"></div>
+        </div>
+        <!-- Step 5: Support -->
+        <div class="wizard-step" id="step-5">
+            <h2>Soporte</h2>
+            <p class="step-desc">Servicios sanitarios y técnicos.</p>
+            <div class="modules-grid">
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/bagno_multiple_3d_1768160141821.jpg"
+                        class="module-icon">
+                    <div class="module-title">Baño Múltiple</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('bagno_multiple', -1)">-</button><input type="number" min="0"
+                            id="in_bagno_multiple" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('bagno_multiple', 1)">+</button></div>
+                </div>
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/bagno_unitario_3d_1768160154552.jpg"
+                        class="module-icon">
+                    <div class="module-title">Baño Unitario</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('bagno_unitario', -1)">-</button><input type="number" min="0"
+                            id="in_bagno_unitario" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('bagno_unitario', 1)">+</button></div>
+                </div>
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/lockers_1768090425952.jpg"
+                        class="module-icon">
+                    <div class="module-title">Lockers</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('lockers', -1)">-</button><input type="number" min="0" id="in_lockers"
+                            class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('lockers', 1)">+</button></div>
+                </div>
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/datacenter_3d_1768160181841.jpg"
+                        class="module-icon">
+                    <div class="module-title">Datacenter</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('datacenter', -1)">-</button><input type="number" min="0"
+                            id="in_datacenter" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('datacenter', 1)">+</button>
+                    </div>
+                </div>
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/almacen_3d.jpg"
+                        class="module-icon">
+                    <div class="module-title">Almacén</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('almacen', -1)">-</button><input type="number" min="0" id="in_almacen"
+                            class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('almacen', 1)">+</button></div>
+                </div>
+                <div class="module-card"><img
+                        src="https://areaprime.com.pe/staging/wp-content/uploads/2026/01/cuarto_limpieza_3d_1768160195214.jpg"
+                        class="module-icon">
+                    <div class="module-title">Cuarto Limpieza</div>
+                    <div class="module-control"><button class="btn-circle"
+                            onclick="adjLayoutVal('cuarto_limpieza', -1)">-</button><input type="number" min="0"
+                            id="in_cuarto_limpieza" class="module-val" value="0"><button class="btn-circle"
+                            onclick="adjLayoutVal('cuarto_limpieza', 1)">+</button></div>
+                </div>
+            </div>
+            <div class="custom-error-msg" id="err-step-5"></div>
+        </div>
+        <!-- Step 6: Form -->
+        <div class="wizard-step" id="step-6">
+            <h2>Datos de Contacto</h2>
+            <p class="step-desc">Para enviar el presupuesto estimado.</p>
+            <div class="form-grid"><input type="text" id="w_name" class="form-input-field"
+                    placeholder="Nombre y Apellido"><input type="email" id="w_email" class="form-input-field"
+                    placeholder="Correo Electrónico"><input type="tel" id="w_phone" class="form-input-field"
+                    placeholder="Número de Teléfono">
+                <div
+                    style="grid-column: 1 / -1; text-align: left; margin-top: 10px; display: none; align-items: center; gap: 10px;">
+                    <!-- Checkbox Removed as requested -->
+                </div>
+            </div>
+            <div class="custom-error-msg" id="err-step-6">Todos los campos son requeridos.</div>
+        </div>
+        <!-- Step 7: Results -->
+        <div class="wizard-step" id="step-7">
+            <!-- <h2>Resultado del Simulador</h2> (HIDDEN) -->
+            <style>
+                /* Layout Styles for Step 7 */
+                .results-container {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: flex-start;
+                    gap: 40px;
+                    width: 100%;
+                    max-width: 1400px;
+                    /* Increased max-width */
+                    margin: 0 auto;
+                }
+
+                #ai-floorplan-section {
+                    flex: 3;
+                    /* Image takes more space */
+                    width: 100%;
+                }
+
+                .results-right {
+                    flex: 2;
+                    /* Data takes less space */
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                }
+
+                /* Minimalist Loading Styles */
+                .ai-loading-container {
+                    width: 100%;
+                    min-height: 400px;
+                    display: none;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .ai-icon-grid {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 20px;
+                    justify-content: center;
+                    max-width: 60%;
+                    z-index: 2;
+                }
+
+                .ai-loading-icon {
+                    width: 60px;
+                    height: 60px;
+                    object-fit: contain;
+                    background: #fff;
+                    border-radius: 12px;
+                    padding: 10px;
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+                    animation: floatIcon 3s ease-in-out infinite;
+                }
+
+                @keyframes floatIcon {
+
+                    0%,
+                    100% {
+                        transform: translateY(0);
+                    }
+
+                    50% {
+                        transform: translateY(-15px);
+                    }
+                }
+
+                /* Mobile Responsive */
+                @media (max-width: 900px) {
+                    .results-container {
+                        flex-direction: column !important;
+                    }
+
+                    #ai-floorplan-section,
+                    .results-right {
+                        width: 100% !important;
+                    }
+                }
+
+                /* INITIAL STATE LAYOUT (Full Width) */
+                .results-container.initial-mode .results-right {
+                    display: none !important;
+                }
+
+                .results-container.initial-mode #ai-floorplan-section {
+                    flex: none;
+                    width: 100%;
+                    max-width: 1000px;
+                    /* Centered */
+                    margin: 0 auto;
+                }
+            </style>
+            <!-- <h2>Resultado del Simulador</h2> (HIDDEN) -->
+            <!-- <h2>Resultado del Simulador</h2> (HIDDEN) -->
+            <div class="results-container initial-mode" id="results-container-main">
+
+                <!-- AI SECTION (Left) -->
+                <div id="ai-floorplan-section">
+                    <!-- 0. INITIAL STATE (Clean & Minimal) -->
+                    <div id="ai-initial-state" style="text-align:center; padding:20px 0;">
+                        <h3 style="color:#2c3e50; margin-bottom:10px; font-size: 1.8em;">Propuesta de Distribución</h3>
+                        <p style="color:#7f8c8d; margin-bottom:30px; line-height:1.5; font-size: 1.1em;">
+                            Obtén una visualización referencial de tu oficina ideal basada en tu selección actual.
+                        </p>
+
+                        <!-- Style Selector -->
+                        <div class="ai-style-selector" style="margin-bottom: 35px;">
+                            <p style="margin-bottom: 15px; font-weight: 600; color: #555; font-size: 1em;">Selecciona
+                                un Estilo Visual:</p>
+                            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                                <div class="style-opt selected"
+                                    data-style="Modern Professional, Minimalist, White and Blue Accents">Moderno</div>
+                                <div class="style-opt"
+                                    data-style="Classic Elegant, Wood Paneling, Warm Lighting, Traditional">Clásico
+                                </div>
+                                <div class="style-opt"
+                                    data-style="Industrial Design, Exposed Brick, Black Metal, Open Ceiling, Concrete Floor">
+                                    Industrial</div>
+                            </div>
+                        </div>
+
+                        <button id="btn-gen-ai-initial" class="ai-btn-gen" onclick="runAIProcess()">
+                            ✨ Generar Layout
+                        </button>
+
+                        <!-- Image Removed as requested -->
+                    </div>
+
+                    <!-- 1. LOADING SCREEN -->
+                    <div id="ai-loading-container" class="ai-loading-container">
+                        <div id="ai-loading-icons" class="ai-icon-grid">
+                            <!-- Icons injected via JS -->
+                        </div>
+                        <h3 style="margin-top:30px; color:#555; font-size:1.2em;">Diseñando tu oficina ideal...</h3>
+                        <div id="ai-progress-percent"
+                            style="font-size:2.5em; font-weight:800; color:#1B35A0; margin-top:5px;">0%</div>
+                        <div class="spinner-border"
+                            style="margin-top:15px; border-top-color:#1B35A0; width:30px; height:30px;"></div>
+                    </div>
+
+                    <!-- 2. FINAL RESULT -->
+                    <img id="ai-image-result" src="" alt="Plano Generado" onclick="window.open(this.src, '_blank')"
+                        style="display:none; width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.1); cursor:zoom-in;">
+                </div>
+
+                <!-- METRICS & CONTROLS (Right) -->
+                <div class="results-right">
+
+                    <!-- Area Box -->
+                    <div class="result-display" style="margin:0;">
+                        <div class="result-label" style="text-align:center;">Área Estimada Total</div>
+                        <div class="result-big-num" style="justify-content:center;"><span
+                                id="res_total_m2">0</span><span style="font-size:0.4em">m²</span></div>
+                    </div>
+
+                    <!-- TEMPORARY SUMMARY STATS (Initial Only) -->
+                    <div id="res-summary-stats"
+                        style="display:flex; justify-content:space-around; width:100%; margin-top:20px; padding:15px; background:#f9f9f9; border-radius:10px; border:1px solid #eee;">
+                        <div style="text-align:center;">
+                            <div style="font-size:1.8em; font-weight:700; color:#2c3e50; line-height:1;"
+                                id="res_sum_pax">0</div>
+                            <div style="font-size:0.85em; color:#7f8c8d; margin-top:5px; font-weight:500;">PERSONAS
+                            </div>
+                        </div>
+                        <div style="width:1px; background:#e0e0e0;"></div>
+                        <div style="text-align:center;">
+                            <div style="font-size:1.8em; font-weight:700; color:#2c3e50; line-height:1;"
+                                id="res_sum_rooms">0</div>
+                            <div style="font-size:0.85em; color:#7f8c8d; margin-top:5px; font-weight:500;">AMBIENTES
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Selected List (Hidden Initially) -->
+                    <div id="res-module-list"
+                        style="display:none; background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; max-height:400px; overflow-y:auto;">
+
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div id="res-action-buttons" style="display:none; flex-direction:column; gap:10px;">
+                        <button class="ai-btn-gen" style="background:#444;" onclick="runAIProcess()">🔄 Regenerar
+                            Propuesta</button>
+                        <button class="ai-btn-gen" onclick="location.reload()">+ Empezar Nuevo Proyecto</button>
+                    </div>
+
+                    <!-- Prompt Debug (Hidden) -->
+                    <div id="ai-prompt-box" style="display:none;"></div>
+
+                </div>
+            </div>
+        </div>
+        <div class="wizard-footer" id="wiz-footer"><button class="btn-nav btn-nav-prev"
+                id="btn-prev">Atrás</button><button class="btn-nav btn-nav-next" id="btn-next">Siguiente</button></div>
+    </div>
+    <!-- Hidden Form for CF7 (ID 509 usually, checking script) -->
+    <!-- Assuming same CF7 ID 509 or similar. Will map fields. -->
+    <div id="hidden-cf7-container">
+        <form action="/staging/calculo/#wpcf7-f509-p7403-o1" method="post" class="wpcf7-form" novalidate
+            id="layout-cf7-form"><input type="hidden" name="nombre_completo" id="cf7_layout_name"><input type="hidden"
+                name="email-57" id="cf7_layout_email"><input type="hidden" name="tel-429" id="cf7_layout_phone">
+            <!-- Dynamic Module Inputs --><input type="hidden" name="pool_trabajo" id="cf7_pool_trabajo">
+            <!-- Add other hidden fields dynamically via JS if needed, or pre-define key ones --><input type="hidden"
+                name="kitchenette" id="cf7_kitchenette"><input type="hidden" name="sala_reunion" id="cf7_sala_reunion">
+            <!-- ... etc ... --><input type="hidden" name="_wpcf7" value="509">
+        </form>
+    </div>
+</div>
+<script>document.addEventListener("DOMContentLoaded", function () {
+        console.log("Layout Wizard: Initializing...");
+
+        /* CONSTANTS & CONFIG */
+
+        /* GLOBAL LABELS */
+        /* Make sure these match the keys in modulesData */
+        const labels = {
+            pool_trabajo: 'Colaboradores - Pool de Trabajo',
+            oficina_gerencia: 'Oficina Gerencia',
+            oficina_jefatura: 'Oficina Jefatura',
+            recepcion: 'Recepción',
+            sala_reunion: 'Sala Reunión',
+            directorio: 'Directorio',
+            sala_lounge: 'Sala Lounge',
+            meet_box: 'Meet Box',
+            phone_booth: 'Phone Booth',
+            kitchenette: 'Kitchenette',
+            comedor: 'Comedor',
+            lactario: 'Lactario',
+            lockers: 'Lockers',
+            almacen: 'Almacén',
+            bagno_multiple: 'Baño Múltiple',
+            bagno_unitario: 'Baño Unitario',
+            datacenter: 'Datacenter',
+            cuarto_limpieza: 'Cuarto Limpieza'
+        }
+
+            ;
+
+        /* TOOLTIP INJECTION */
+        function injectTooltips() {
+            const descriptions = {
+                'pool_trabajo': 'Espacio colaborativo abierto. Área: 4.5m² por persona. Incluye escritorio, silla y circulación. (Obligatorio)',
+                'oficina_gerencia': 'Oficina privada ejecutiva (12m²). Espacio para escritorio gerencial y mesa de reunión.',
+                'oficina_jefatura': 'Oficina privada de supervisión (10m²). Privacidad para mandos medios.',
+                'recepcion': 'Área de bienvenida y espera (15m²). Imagen corporativa obligatoria.',
+                'sala_reunion': 'Sala para juntas de equipo (2m² por persona). Mesa central y equipamiento.',
+                'directorio': 'Sala ejecutiva premium (4m² por persona). Para toma de decisiones y clientes.',
+                'sala_lounge': 'Espacio informal (3m² por persona). Para descanso, café y socialización.',
+                'meet_box': 'Cabina acústica rápida (1m² por persona). Reuniones 1 a 1 sin reserva.',
+                'phone_booth': 'Cabina individual privada (1.5m²). Para llamadas y videollamadas.',
+                'kitchenette': 'Área de preparación de café/comida (9m²). Punto de encuentro.',
+                'comedor': 'Espacio para almorzar (2m² por persona). Mesas y sillas de alto tráfico.',
+                'lactario': 'Sala privada para madres (7.5m²). Cumple normativa de ley.',
+                'lockers': 'Ingresa la cantidad de colaboradores. El sistema calcula automáticamente los módulos necesarios (Ej. 1 torre cada 4 personas).',
+                'almacen': 'Depósito de suministros (0.4m² por unidad). Archivo y logística.',
+                'bagno_multiple': 'Ingresa la cantidad de colaboradores. (Se calcula 1 unidad por cada 10 personas).',
+                'bagno_unitario': 'Ingresa la cantidad de colaboradores. (Se calcula 1 unidad por cada 10 personas).',
+                'datacenter': 'Cuarto de servidores climatizado (3m²). Seguridad de TI.',
+                'cuarto_limpieza': 'Área de mantenimiento (3m²). Lavadero y útiles.'
+            }
+
+                ;
+
+            document.querySelectorAll('.module-card').forEach(card => {
+                if (card.querySelector('.aprime-tooltip')) return;
+                const input = card.querySelector('input');
+                if (!input || !input.id) return;
+                const key = input.id.replace('in_', '');
+                const text = descriptions[key];
+
+                if (text) {
+                    const tipText = document.createElement('span');
+                    tipText.className = 'aprime-tooltip-text';
+                    tipText.innerText = text;
+                    card.appendChild(tipText);
+                }
+            });
+        }
+
+        /* Initialize Tooltips after DOM ready */
+        setTimeout(injectTooltips, 500);
+
+
+
+
+        /* DATA HANDOFF RECEIVER */
+        /* DATA HANDOFF RECEIVER */
+
+        const totalSteps = 7;
+        /* Elements */
+        const btnStart = document.getElementById('btn-start-intro');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const wizFooter = document.getElementById('wiz-footer');
+
+        /* Data Model */
+        const modulesData = {
+            bagno_multiple: {
+                m2: 3.00, price: 312.75, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            bagno_unitario: {
+                m2: 2.25, price: 309.16, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            kitchenette: {
+                m2: 9.00, price: 391.12, pre: 25.09, var: 28.28, mob: 99.66, max: 2
+            }
+
+            ,
+            sala_reunion: {
+                m2: 2.00, price: 434.80, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            directorio: {
+                m2: 4.00, price: 449.17, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            sala_lounge: {
+                m2: 3.00, price: 364.44, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            meet_box: {
+                m2: 1.00, price: 414.60, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            phone_booth: {
+                m2: 1.50, price: 427.09, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            lockers: {
+                m2: 0.15, price: 348.90, pre: 25.09, var: 28.28, mob: 249.15
+            }
+
+            ,
+            datacenter: {
+                m2: 3.00, price: 418.38, pre: 25.09, var: 28.28, mob: 0
+            }
+
+            ,
+            pool_trabajo: {
+                m2: 4.50, price: 439.47, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            oficina_gerencia: {
+                m2: 12.00, price: 449.54, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            oficina_jefatura: {
+                m2: 10.00, price: 445.51, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            recepcion: {
+                m2: 15.00, price: 414.60, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            almacen: {
+                m2: 0.40, price: 348.90, pre: 25.09, var: 28.28, mob: 249.15
+            }
+
+            ,
+            comedor: {
+                m2: 2.00, price: 391.12, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            cuarto_limpieza: {
+                m2: 3.00, price: 309.16, pre: 25.09, var: 28.28, mob: 99.66
+            }
+
+            ,
+            lactario: {
+                m2: 7.50, price: 391.12, pre: 25.09, var: 28.28, mob: 99.66
+            }
+        }
+
+            ;
+
+        /* User State */
+        const inputs = {}
+
+            ;
+
+        Object.keys(modulesData).forEach(function (k) {
+            inputs[k] = 0;
+        });
+
+        /* DATA HANDOFF RECEIVER (Corrected Scope) */
+        let step = 0;
+
+        try {
+            var handoffData = localStorage.getItem('aprime_handoff_data');
+
+            if (handoffData) {
+                var data = JSON.parse(handoffData);
+                console.log("Received Handoff Data:", data);
+
+                if (data.collabs) {
+                    inputs.pool_trabajo = parseInt(data.collabs) || 0;
+                    // Force update DOM element immediately
+                    var poolInput = document.getElementById('in_pool_trabajo');
+
+                    if (poolInput) {
+                        poolInput.value = inputs.pool_trabajo;
+                        // Trigger visual update if needed (e.g. active class)
+                        var card = poolInput.closest('.module-card');
+
+                        if (card && inputs.pool_trabajo > 0) {
+                            card.classList.add('active-module');
+                            // lockPoolInput(); // Lock removed by request
+                        }
+                    }
+                }
+
+                if (data.skip_intro) {
+                    step = 1;
+                    /* Skip Intro */
+                }
+
+                localStorage.removeItem('aprime_handoff_data');
+            }
+        }
+
+        catch (e) {
+            console.warn("Error reading handoff data:", e);
+        }
+
+        /* INIT FROM URL PARAMS (Correct placement after inputs init) */
+        function initFromParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const totalStaff = parseInt(urlParams.get('colab') || urlParams.get('total_staff') || urlParams.get('q') || '0');
+
+            if (totalStaff > 0 && !isNaN(totalStaff)) {
+                inputs.pool_trabajo = totalStaff;
+                // Delay slightly to ensure UI is built if needed, though inputs is ready
+                setTimeout(updateUI, 100);
+            }
+        }
+
+        setTimeout(initFromParams, 200);
+
+        /* Event Listeners */
+        if (btnStart) btnStart.addEventListener('click', function () {
+            wizNext(1);
+        });
+
+        if (btnPrev) btnPrev.addEventListener('click', function () {
+            wizNext(-1);
+        });
+
+        if (btnNext) btnNext.addEventListener('click', function () {
+            wizNext(1);
+        });
+
+        /* Expose adjLayoutVal globally */
+        /* Updated Logic for Manual + Button Input */
+        window.setModuleValue = function (id, newVal) {
+            const el = document.getElementById('in_' + id);
+            if (!el) return;
+
+            /* Limit Logic */
+            let limit = 100;
+            if (id === 'pool_trabajo') limit = 500;
+
+            /* Parse and Validate */
+            newVal = parseInt(newVal);
+            if (isNaN(newVal) || newVal < 0) newVal = 0;
+            if (newVal > limit) newVal = limit;
+
+            /* Update State and UI */
+            inputs[id] = newVal;
+            el.value = newVal;
+
+            /* Visual Feedback for Active State */
+            var card = el.closest('.module-card');
+            if (card) {
+                if (newVal > 0) card.classList.add('active-module');
+                else card.classList.remove('active-module');
+            }
+        }
+
+        /* Expose adjLayoutVal globally */
+        window.adjLayoutVal = function (id, delta) {
+            /* Now uses setModuleValue logic */
+            var el = document.getElementById('in_' + id);
+            if (!el) return;
+            var currentVal = parseInt(el.value) || 0;
+            var newVal = currentVal + delta;
+            setModuleValue(id, newVal);
+        }
+
+        /* Attach Input Listeners on Load */
+        setTimeout(function () {
+            const moduleInputs = document.querySelectorAll('.module-val');
+            moduleInputs.forEach(input => {
+                input.addEventListener('input', function (e) {
+                    const id = this.id.replace('in_', '');
+                    setModuleValue(id, this.value);
+                });
+
+                // Prevent invalid chars
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === '-' || e.key === 'e' || e.key === '.') {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+
+            /* Attach Style Select Listeners */
+            document.querySelectorAll('.style-opt').forEach(opt => {
+                opt.onclick = function () {
+                    document.querySelectorAll('.style-opt').forEach(el => el.classList.remove('selected'));
+                    this.classList.add('selected');
+                }
+            });
+        }, 500);
+
+
+
+        /* Helper to Lock Pool Input (Visual + Functional) */
+        function lockPoolInput() {
+            const el = document.getElementById('in_pool_trabajo');
+            if (!el) return;
+            const card = el.closest('.module-card');
+
+            if (card) {
+                // Remove buttons and show padlock
+                const controls = card.querySelector('.module-control');
+
+                if (controls) {
+                    controls.innerHTML = ` <div style="display:flex; align-items:center; justify-content:center; gap:5px; color:#7f8c8d;" > <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><rect x="3" y="11" width="18" height="11" rx="2" ry="2" ></rect><path d="M7 11V7a5 5 0 0 1 10 0v4" ></path></svg> <span style="font-weight:bold; font-size:1.2em;" >$ {
+                            el.value
+                        }
+
+                        </span> </div> `;
+                    // Ensure input is updated even though removed from DOM
+                    // (The value is already in inputs.pool_trabajo)
+                }
+            }
+        }
+
+        /* Toast Notification Helper */
+        function showToast(msg) {
+            let toast = document.getElementById('aprime-toast');
+
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'aprime-toast';
+                toast.style.cssText = "position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#2c3e50; color:#fff; padding:10px 20px; border-radius:30px; box-shadow:0 5px 15px rgba(0,0,0,0.2); z-index:9999; font-size:0.9em; opacity:0; transition:opacity 0.3s;";
+                document.body.appendChild(toast);
+            }
+
+            toast.innerText = msg;
+            toast.style.opacity = '1';
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }
+
+                , 3000);
+        }
+
+        function wizNext(n) {
+            /* Validation Step 1 (Workspace) */
+            /* NOTE: Step 1 is Index 1, which corresponds to Step 2 (Workspace). Index 0 is Welcome */
+            /* Current Step is tracked by variable 'step' */
+
+            /* If we are at Step 1 (Workspace), validate */
+            if (step === 1) {
+
+                /* Corresponds to Workspace */
+                if (n === 1) {
+                    /* Moving forward */
+
+
+                    if (!validateStep(step)) return;
+                }
+            }
+
+            /* Validation Step 4 (Support/Bathrooms) */
+            if (step === 4) {
+                if (n === 1) {
+                    if (!validateStep(step)) return;
+                }
+            }
+
+            /* Logic for Step 5 -> Finish */
+            if (step === 5) {
+                if (n === 1) {
+                    /* Finish Form */
+                    if (!validateStep(step)) return;
+                    /* FORCE Validation */
+                    calculateAndSend();
+                }
+            }
+
+            step += n;
+            if (step < 0) step = 0;
+            if (step >= totalSteps) step = totalSteps - 1;
+            updateUI();
+        }
+
+        function validateStep(n) {
+            /* n is the index */
+            const err = document.getElementById('err-step-' + (n + 1));
+            if (err) err.style.display = 'none';
+
+            if (n === 1) {
+
+                /* Step 2: Workspace */
+                if (inputs.pool_trabajo <= 0) {
+                    if (err) {
+                        err.innerText = "Ingresa la cantidad de colaboradores.";
+                        err.style.display = 'block';
+                    }
+
+                    return false;
+                }
+            }
+
+            /* Step 5 (Index 4): Support Areas (Bathrooms are here usually) */
+            /* Checking checking step index for bathrooms. Assume it is step 4 (index 3 or 4). */
+            /* Actually, looking at UI flow, bathrooms are usually in the last module step before form. */
+            /* If step == 4 (Support & Services) */
+            if (n === 4) {
+                const baths = (inputs.bagno_unitario || 0) + (inputs.bagno_multiple || 0);
+
+                if (baths <= 0) {
+                    if (err) {
+                        err.innerText = "Es obligatorio seleccionar al menos un baño (Múltiple y/o Unitario).";
+                        err.style.display = 'block';
+                    }
+
+                    return false;
+                }
+            }
+
+            if (n === 5) {
+                /* Step 6: Form */
+                const name = document.getElementById('w_name').value;
+                const email = document.getElementById('w_email').value;
+                const phone = document.getElementById('w_phone').value;
+                if (!name) return failVal();
+                if (!email) return failVal();
+                if (!phone) return failVal();
+
+                function failVal() {
+                    if (err) err.style.display = 'block';
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function updateUI() {
+            /* Render active step */
+            console.log("Updating UI for step:", step);
+
+            for (let i = 0; i < totalSteps; i++) {
+                const el = document.getElementById('step-' + (i + 1));
+
+                if (el) {
+                    el.classList.remove('active');
+                    if (i === step) el.classList.add('active');
+                }
+            }
+
+            /* Render Progress Bar */
+            const pct = ((step + 1) / totalSteps) * 100;
+            const bar = document.getElementById('wiz-progress');
+            const num = document.getElementById('wiz-step-num');
+            if (bar) bar.style.width = pct + '%';
+            if (num) num.innerText = (step + 1);
+
+            /* Render Footer Visibility */
+            if (step === 0) {
+                if (btnPrev) btnPrev.style.visibility = 'hidden';
+                if (wizFooter) wizFooter.style.display = 'none';
+            }
+
+            else {
+                if (btnPrev) btnPrev.style.visibility = 'visible';
+                if (wizFooter) wizFooter.style.display = 'flex';
+            }
+
+            /* Render Next Button Text */
+            if (step === totalSteps - 1) {
+                if (wizFooter) wizFooter.style.display = 'none';
+            }
+
+            else if (step === 5) {
+                /* Form Step */
+                if (btnNext) btnNext.innerText = 'VER RESULTADOS';
+            }
+
+            else {
+                if (btnNext) btnNext.innerText = 'Siguiente';
+            }
+
+            /* Final Step Footer Logic */
+            if (step === totalSteps - 1) {
+                if (wizFooter) wizFooter.style.display = 'none';
+            }
+
+            /* Scroll to top usually, but on init maybe not needed. */
+            /* Only scroll if not initial load (we can check if we moved) */
+        }
+
+        function calculateAndSend() {
+            let totalM2 = 0;
+            let totalPrice = 0;
+
+            Object.keys(inputs).forEach(function (key) {
+                let qty = inputs[key];
+
+                /* STRICT FORMULA OVERRIDE: Calculate "As It Should Be" */
+                /* User input is ignored for these modules in the final Price/Area calc */
+                /* STRICT FORMULA OVERRIDE: Calculate "As It Should Be" */
+                /* User input is ignored for these modules in the final Price/Area calc */
+                if (key === 'lockers') {
+                    qty = inputs['lockers'] || 0; // 1 per person input
+                }
+                if (key === 'bagno_multiple') {
+                    // 1 per 10 pax
+                    qty = Math.ceil((inputs['bagno_multiple'] || 0) / 10);
+                }
+                if (key === 'bagno_unitario') {
+                    // 1 per 10 pax (Standardized per user request "calc by persons")
+                    qty = Math.ceil((inputs['bagno_unitario'] || 0) / 10);
+                }
+
+                /* Ensure bagno_unitario is counted as added by user if any? 
+                   User said "calcule como es". Usually bathrooms are total.
+                   If we enforce Bagno Multiple, we might just use that.
+                   Let's assume Unitario is 'extra' or 'alternative'.
+                   Actually, strict formula implies we define the standard.
+                   If user adds Unitario, it adds cost.
+                   But for Multiple, we force the standard count. */
+
+                if (qty > 0) {
+                    const d = modulesData[key];
+                    const costPerM2 = d.price + d.pre + d.var + d.mob;
+                    const m2ForModule = d.m2 * qty;
+                    const subtotal = costPerM2 * m2ForModule;
+                    totalM2 += m2ForModule;
+                    totalPrice += subtotal;
+                }
+            });
+
+            /* CALCULATE SUMMARY STATS (Pax / Rooms) */
+            let totalPax = 0;
+            let totalRooms = 0;
+
+            /* Pax: Pool + Offices */
+            if (inputs['pool_trabajo']) totalPax += parseInt(inputs['pool_trabajo']);
+            if (inputs['oficina_gerencia']) totalPax += parseInt(inputs['oficina_gerencia']);
+            if (inputs['oficina_jefatura']) totalPax += parseInt(inputs['oficina_jefatura']);
+            if (inputs['recepcion']) totalPax += 1; // Assuming 1 receptionist
+
+            /* Rooms: Count of active modules */
+            Object.keys(inputs).forEach(k => {
+                if (inputs[k] > 0) {
+                    // Count specific modules or just all? User said "Ambientes".
+                    // Maybe exclude pool if it's open plan, but it IS an area.
+                    // Let's count all selected keys as "Ambientes" or "Zones".
+                    totalRooms++;
+                }
+            });
+
+            const sumPaxEl = document.getElementById('res_sum_pax');
+            const sumRoomsEl = document.getElementById('res_sum_rooms');
+            if (sumPaxEl) sumPaxEl.innerText = totalPax;
+            if (sumRoomsEl) sumRoomsEl.innerText = totalRooms;
+
+
+            /* Circulation 25-30% */          const m2Extra = totalM2 * 0.05;
+            const extraCost = m2Extra * 500;
+            totalM2 += m2Extra;
+            totalPrice += extraCost;
+            const resM2 = document.getElementById('res_total_m2');
+            const resPrice = document.getElementById('res_total_price');
+            const resEmail = document.getElementById('res_display_email');
+            if (resM2) animateValue(resM2, 0, Math.ceil(totalM2), 1500);
+
+            if (resPrice) resPrice.innerText = totalPrice.toLocaleString('en-US', {
+                style: 'currency', currency: 'USD'
+            });
+            const emailVal = document.getElementById('w_email').value;
+            if (resEmail) resEmail.innerText = emailVal;
+
+            /* Render Selected List Below AI Plan */
+            /* Auto-Generate AI Plan (List rendered after success) */
+            /* Send Lead */
+            const cf7Name = document.getElementById('cf7_layout_name');
+            const cf7Email = document.getElementById('cf7_layout_email');
+            const cf7Phone = document.getElementById('cf7_layout_phone');
+            /* Update hidden inputs just in case (e.g. for fallback) */
+            if (cf7Name) cf7Name.value = document.getElementById('w_name').value;
+            if (cf7Email) cf7Email.value = emailVal;
+            if (cf7Phone) cf7Phone.value = document.getElementById('w_phone').value;
+
+            /* CF7 REST API SUBMISSION */
+            /* CF7 REST API SUBMISSION -- ID 7448 (Layout Form) */
+            const form = document.getElementById('layout-cf7-form');
+
+            if (form) {
+                const fd = new FormData();
+
+                /* 1. Contact Info */
+                let rawName = document.getElementById('w_name').value;
+                // const optIn = document.getElementById('w_optin_contact').checked; // REMOVED
+
+                /* Append intent to name so it appears in email subject/body instantly */
+                const finalName = rawName; // Simplified since checkbox is gone
+
+                fd.append('nombre_completo', finalName);
+                fd.append('email-57', emailVal);
+                fd.append('tel-429', document.getElementById('w_phone').value);
+
+                /* 2. Module Values (Syncing with CF7 Field Names found in inspection) */
+                /* Some names match our keys exactly, others might need check */
+                Object.keys(inputs).forEach(k => {
+                    fd.append(k, inputs[k]);
+                });
+
+                /* 3. Required CF7 Security Params */
+                const FORM_ID = '7448';
+                fd.append('_wpcf7', FORM_ID);
+                fd.append('_wpcf7_unit_tag', 'wpcf7-f' + FORM_ID + '-p7403-o1');
+                fd.append('_wpcf7_container_post', '7448'); // Should match the post ID where form lives or form ID itself
+
+                /* 4. Send to REST API */
+                fetch('/staging/wp-json/contact-form-7/v1/contact-forms/' + FORM_ID + '/feedback', {
+                    method: 'POST',
+                    body: fd
+
+                }).then(r => r.json()).then(data => {
+                    console.log('CF7 Sent:', data);
+                    /* Optional: Check data.status === 'mail_sent' */
+                }).catch(err => console.error('CF7 Error:', err));
+            }
+        }
+
+        /* HELPER: Animate Number */
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            }
+
+                ;
+            window.requestAnimationFrame(step);
+        }
+
+        /* AI FUNCTIONS */
+
+        /* GLOBAL TIMER FOR PROGRESS */
+        let progressInterval = null;
+
+        /* AI FUNCTIONS */
+        window.runAIProcess = async function () {
+            // const btn = document.getElementById('btn-gen-ai'); // Removed old button ID ref
+            const initialState = document.getElementById('ai-initial-state');
+            const loader = document.getElementById('ai-loading-container');
+            const promptBox = document.getElementById('ai-prompt-box');
+            const imgResult = document.getElementById('ai-image-result');
+            const listContainer = document.getElementById('res-module-list');
+            const actionBtns = document.getElementById('res-action-buttons');
+            const progressText = document.getElementById('ai-progress-percent');
+            const summaryStats = document.getElementById('res-summary-stats'); // NEW
+
+            /* Reset UI */
+            promptBox.style.display = 'none';
+            if (imgResult) imgResult.style.display = 'none';
+            if (actionBtns) actionBtns.style.display = 'none';
+            if (initialState) initialState.style.display = 'block'; // Ensure proper reset state if re-running logic
+            // Wait, if regenerating, initialState should probably be hidden? 
+            // Actually runAIProcess is clicked FROM initialState button mostly.
+            // If regenerating, we might want to hide initialState.
+            // But the listener below hides it.
+
+            if (initialState) initialState.style.display = 'none'; // Correct hide on click
+
+            if (listContainer) {
+                listContainer.style.display = 'none'; // Ensure list is hidden during load
+            }
+            // Stats should remain visible during load? User said "when generated, no appear".
+            // So leaving them visible during load is fine, or arguably nice context while waiting.
+            if (summaryStats) summaryStats.style.display = 'flex'; // Reset to visible incase it was hidden
+
+            if (summaryStats) summaryStats.style.display = 'flex'; // Reset to visible incase it was hidden
+
+            /* STYLE MATERIAL MAP (Refined) */
+            const styleDetails = {
+                'Modern Professional, Minimalist, White and Blue Accents': 'Materials: Matte White Walls, Light Oak Floor, Glass Partitions with Silver Frames, Navy Blue Accent Chairs. Lighting: 5000K Cool White (Productivity).',
+                'Classic Elegant, Wood Paneling, Warm Lighting, Traditional': 'Materials: Walnut Wood Wall Paneling, Cream/Beige Carpeting, Leather Chairs, Brass/Gold Fittings. Lighting: 3000K Warm White (Cozy).',
+                'Industrial Design, Exposed Brick, Black Metal, Open Ceiling, Concrete Floor': 'Materials: Red Exposed Brick Walls, Polished Concrete Floor, Black Metal Frames on Glass, Open Ceiling with Ducts. Lighting: Edison Bulbs + Track Lights.'
+            };
+
+            /* POPULATE LOADING ICONS & RESET PROGRESS */
+            const iconGrid = document.getElementById('ai-loading-icons');
+            if (iconGrid) {
+                iconGrid.innerHTML = '';
+                // Loop inputs to find active modules
+                Object.keys(inputs).forEach(key => {
+                    if (inputs[key] > 0) {
+                        const inputEl = document.getElementById('in_' + key);
+                        if (inputEl) {
+                            const card = inputEl.closest('.module-card');
+                            if (card) {
+                                const img = card.querySelector('img.module-icon');
+                                if (img) {
+                                    const iconClone = document.createElement('img');
+                                    iconClone.src = img.src;
+                                    iconClone.className = 'ai-loading-icon';
+                                    iconClone.style.animationDelay = (Math.random() * 1) + 's';
+                                    iconGrid.appendChild(iconClone);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            /* START PROGRESS SIMULATION */
+            if (progressText) progressText.innerText = "0%";
+            loader.style.display = 'flex';
+
+            let currentProgress = 0;
+            if (progressInterval) clearInterval(progressInterval);
+            progressInterval = setInterval(() => {
+                // Slow down as it gets higher to avoid hitting 100% before real completion
+                let increment = 0;
+                if (currentProgress < 30) increment = Math.random() * 5;
+                else if (currentProgress < 70) increment = Math.random() * 2;
+                else if (currentProgress < 95) increment = Math.random() * 0.5;
+
+                currentProgress += increment;
+                if (currentProgress > 99) currentProgress = 99;
+
+                if (progressText) progressText.innerText = Math.floor(currentProgress) + "%";
+            }, 500);
+
+
+            try {
+                /* STEP 1: CONSTRUCT PROMPT */
+                // status.innerText = "1/2 Redactando Prompt Arquitectónico...";
+
+                /* Build Context & Display List */
+                // Style Logic Updated (Now includes specialized materials)
+                const selectedStyleEl = document.querySelector('.style-opt.selected');
+                let styleKey = selectedStyleEl ? selectedStyleEl.getAttribute('data-style') : "Modern Professional, Minimalist, White and Blue Accents";
+                let styleMaterials = styleDetails[styleKey] || "Materials: Modern Standard.";
+                let styleText = styleKey; // Keep original short text for prompt header
+
+                let context = "Modules Selected:\n";
+                let listHtml = "<h4 style='margin-bottom:15px; color:#2c3e50; border-bottom:1px solid #eee; padding-bottom:10px;'>Tu Selección:</h4><ul style='list-style:none; padding:0; margin:0;'>";
+
+                /* Prompt Translation Map for better AI context */
+                const promptMappings = {
+                    'oficina_gerencia': 'Executive Private Office (Large Desk, Meeting Table)',
+                    'oficina_jefatura': 'Supervisor Private Office (Standard Desk)',
+                    'recepcion': 'Reception Area (Front Desk, Waiting Seating)',
+                    'sala_reunion': 'Meeting Room (Conference Table for 6-8)',
+                    'directorio': 'Boardroom (Premium Conference Table for 10-12)',
+                    'sala_lounge': 'Lounge Area (Sofas, Armchairs, Coffee Tables)',
+                    'meet_box': 'Meet Box (Small Acoustic Booth for 2 people)',
+                    'phone_booth': 'Phone Booth (Individual Acoustic Pod)',
+                    'kitchenette': 'Kitchenette (Counter, Sink, Coffee Point, NO Dining Tables)',
+                    'comedor': 'Dining Area (Cafeteria Tables and Chairs)',
+                    'lactario': 'Nursing Room / Mother\'s Room (Private, Sofa, Small Fridge)',
+                    'almacen': 'Storage Room (Shelving units)',
+                    'datacenter': 'Server Room (IT Racks, Cooling)',
+                    'cuarto_limpieza': 'Janitor Closet (Sink, Cleaning Supplies)'
+                };
+
+                Object.keys(inputs).forEach(k => {
+                    if (inputs[k] > 0) {
+                        /* List styling */
+                        /* List styling (Compact) */
+                        const liStyle = "padding:5px 0; border-bottom:1px solid #f5f5f5; display:flex; justify-content:space-between; align-items:center; color:#555; font-size:0.9em;";
+                        const bStyle = "font-weight:700; color:#1B35A0; background:#eef2ff; padding:1px 8px; border-radius:10px; font-size:0.85em;";
+
+                        /* BATHROOM LOGIC: Specific Handling */
+                        if (k === 'bagno_multiple') {
+                            const toilets = Math.ceil(inputs[k] / 10);
+                            const sinks = Math.ceil(toilets / 2); // 1 sink per 2 toilets roughly
+                            context += `- 1 Large Public Restroom Block containing ${toilets} Private Stalls and ${sinks} Shared Sinks. (Commercial Style, Fully Enclosed Block).\n`;
+                            listHtml += `<li style="${liStyle}"><span>Baño Múltiple</span> <span style="${bStyle}">Zona (${toilets} wc)</span></li>`;
+                        }
+                        else if (k === 'bagno_unitario') {
+                            const toilets = Math.ceil(inputs[k] / 10);
+                            context += `- ${toilets} x Fully Enclosed Private Restrooms (Type: Powder Room. 1.5m x 2m. Contents: 1 WC + 1 Sink immediately next to each other. Door Closed).\n`;
+                            listHtml += `<li style="${liStyle}"><span>Baño Unitario</span> <span style="${bStyle}">${toilets} unid.</span></li>`;
+                        }
+                        /* FALLBACK for legacy or other bathroom keys */
+                        else if (k.includes('bath') && k !== 'bagno_multiple' && k !== 'bagno_unitario') {
+                            const toilets = Math.ceil(inputs[k] / 10);
+                            context += `- ${toilets} x Single-User Restrooms (Type: "Powder Room", Size: 1.5m x 2m. Contents: Strictly 1 WC + 1 Sink)\n`;
+                            listHtml += `<li style="${liStyle}"><span>Baños</span> <span style="${bStyle}">${toilets} unid.</span></li>`;
+                        }
+                        /* LOCKERS LOGIC: */
+                        else if (labels[k].toLowerCase().includes('locker')) {
+                            // User enters PERSON count. We prompt for "compartments" in 1 bank.
+                            context += `- 1 Bank of Lockers (Single linear storage furniture containing ${inputs[k]} small individual compartments/doors for ${inputs[k]} people. NOT separate units, but one consolidated block.)\n`;
+                            listHtml += `<li style="${liStyle}"><span>Lockers</span> <span style="${bStyle}">${inputs[k]} pax</span></li>`;
+                        }
+                        /* WORKSTATION LOGIC: */
+                        else if (labels[k].toLowerCase().includes('colaborador') || labels[k].toLowerCase().includes('trabajador')) {
+                            context += `- ${inputs[k]} Individual Workstations (Strictly 1 Chair per desk). Total Chairs: ${inputs[k]}\n`;
+                            listHtml += `<li style="${liStyle}"><span>${labels[k]}</span> <span style="${bStyle}">${inputs[k]}</span></li>`;
+                        }
+                        else {
+                            // GENERIC FALLBACK WITH TRANSLATION
+                            // Use mapped English term if available, else Spanish label.
+                            const pName = promptMappings[k] || labels[k];
+                            context += `- ${inputs[k]} x ${pName}\n`;
+                            listHtml += `<li style="${liStyle}"><span>${labels[k]}</span> <span style="${bStyle}">${inputs[k]}</span></li>`;
+                        }
+                    }
+                });
+
+                listHtml += "</ul>";
+
+                /* INJECT LIST RIGHT AWAY OR AFTER? Let's inject now */
+                if (listContainer) listContainer.innerHTML = listHtml;
+
+                /* STRICT NEGATIVE PROMPTS (Anti-Hallucination) */
+                let negativeConstraints = "";
+                const hasModule = (key) => inputs[key] && parseInt(inputs[key]) > 0;
+                if (!hasModule('kitchenette') && !hasModule('comedor')) {
+                    negativeConstraints += "- NO Kitchenette, NO Dining Tables, NO Kitchen Sink, NO Breakroom range.\n";
+                }
+                if (!hasModule('recepcion')) {
+                    negativeConstraints += "- NO Reception Desk, NO Waiting Area.\n";
+                }
+                context += `\n[EXPLICIT EXCLUSIONS]:\n${negativeConstraints}`;
+
+                /* Inject List into UI */
+                // This block is now handled by the new listContainer logic above.
+                // let listContainer = document.getElementById('ai-module-list');
+                // if (!listContainer) {
+                //     listContainer = document.createElement('div');
+                //     listContainer.id = 'ai-module-list';
+                //     listContainer.style.background = '#fff';
+                //     listContainer.style.padding = '15px';
+                //     listContainer.style.borderRadius = '8px';
+                //     listContainer.style.marginTop = '20px';
+                //     listContainer.style.border = '1px solid #eee';
+                //     document.getElementById('ai-floorplan-section').appendChild(listContainer);
+                // }
+                // listContainer.innerHTML = listHtml;
+
+                const promptResponse = await fetch('https://api-flowvix-1brj.vercel.app/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'gemini-2.0-flash-exp', // Use Text Model
+                        prompt: `
+                            You are an architect compatible with Blender 3D Logic.
+                            Given the user's selected modules:
+                            ${context}
+                            
+                            Generate a High-Fidelity Architectural 3D Description.
+                            [SCENE]: 
+                              - "3D Cutaway Isometric View of an INDOOR Office Floor (Surrounded by walls, NOT floating)."
+                            [STYLE]:
+                              - "${styleText}"
+                              - "${styleMaterials}"
+                              - "High-End Blender Cycles Render, Global Illumination, Soft Sun Lighting, Ambient Occlusion, 8k Resolution."
+                              - "Photorealistic, Modern Office, Neutral Tones, Glass Partitions, Wood Accents."
+                            [COMPONENTS]:
+                              - List every room with exact counts and geometry (e.g., "Size: 1.5x2m").
+                              - For Workstations: Specify "Individual Desks" and exact chair count.
+                              - For Bathrooms: Specify "EXACTLY X Private Rooms (Count is Critical)".
+                              - For Lockers: Draw as "1 Bank/Group" (Not individual boxes).
+                            [ADJACENCY RULES]:
+                              - Reception -> NEAR Main Entrance (Must be first visible area).
+                              - Comedor/Dining -> FAR from Reception (Back of Office, acoustic separation).
+                              - Bathrooms -> Central Core or discrete side location (NOT near Directorio).
+                              ${hasModule('sala_reunion') && hasModule('recepcion') ? '- Meeting Room -> NEAR Reception (Easy guest access).' : ''}
+                              ${hasModule('oficina_gerencia') && hasModule('oficina_jefatura') ? '- Jefatura -> NEAR Gerencia (Management Cluster).' : ''}
+                              ${hasModule('datacenter') ? '- Datacenter -> Hidden internal room (No windows).' : ''}
+                            [CONSTRAINTS]:
+                              - MUST DRAW ALL LISTED ROOMS (Do not omit anything).
+                              - NO Unlisted Rooms (No Manager Office unless listed).
+                              - NO Ceiling Lights, NO Suspended Lamps, NO Roof Elements (Cutaway View).
+                              - NO Text, NO Dimensions, NO Labels on floor.
+                              - NO Showers, NO Bathtubs, NO Double Toilets.
+                              ${negativeConstraints}
+                            
+                            OUTPUT:
+                            Return ONLY the structured prompt text. Do not include introductory text.`
+                    })
+                });
+
+                const promptData = await promptResponse.json();
+                const generatedPrompt = promptData.candidates?.[0]?.content?.parts?.[0]?.text || "Error creating prompt.";
+
+                /* Process Prompt as before... */
+                promptBox.innerText = generatedPrompt;
+
+                /* UI VISUAL LOGIC (Animation, Buttons) */
+                // SWITCH LAYOUT TO 2-COLUMN MODE
+                const resContainer = document.getElementById('results-container-main');
+                if (resContainer) {
+                    resContainer.classList.remove('initial-mode');
+                }
+
+                // ... (Preserved earlier logic) ...
+                // status.style.display = 'none'; // Removed
+                imgResult.style.display = 'none';
+                promptBox.style.display = 'none';
+
+                // const actions = document.getElementById('ai-action-buttons'); // Removed
+                // if (actions) actions.style.display = 'none'; // Removed
+
+                // This animation logic is replaced by the new iconGrid logic
+                // let animContainer = document.getElementById('ai-construction-anim');
+                // if (!animContainer) {
+                //     animContainer = document.createElement('div');
+                //     animContainer.id = 'ai-construction-anim';
+                //     const icon1 = "https://areaprime.com.pe/staging/wp-content/uploads/2026/01/recepcion_3d_1768091984218.jpg";
+                //     const icon2 = "https://areaprime.com.pe/staging/wp-content/uploads/2026/01/sala_lounge_3d_1768160088610.jpg";
+                //     const icon3 = "https://areaprime.com.pe/staging/wp-content/uploads/2026/01/lockers_1768090425952.jpg";
+
+                //     /* Insert Animation BEFORE the Image Result (Top of section) */
+                //     const section = document.getElementById('ai-floorplan-section');
+                //     const imgRes = document.getElementById('ai-image-result');
+
+                //     animContainer.innerHTML = `
+                //         <p style="position:absolute; bottom:20px; width:100%; text-align:center; color:#888; font-weight:600; font-size:0.9em;">
+                //             Construyendo propuesta...
+                //         </p>
+                //         <img src="${icon1}" class="const-icon" style="top:40%; left:30%; animation: construct 0.8s forwards 0.2s;">
+                //         <img src="${icon2}" class="const-icon" style="top:30%; left:50%; animation: construct 0.8s forwards 0.6s;">
+                //         <img src="${icon3}" class="const-icon" style="top:50%; left:60%; animation: construct 0.8s forwards 1.0s;">
+                //     `;
+
+                //     if (section && imgRes) {
+                //         section.insertBefore(animContainer, imgRes);
+                //     } else {
+                //         document.getElementById('ai-floorplan-section').appendChild(animContainer);
+                //     }
+                // }
+
+                /* HIDE GENERATE BUTTON START */
+                // if (btn) btn.style.display = 'none'; // Moved to initial reset
+
+                // animContainer.style.display = 'block'; // Removed
+
+                /* STEP 2: GENERATE IMAGE (Use Image Model via Proxy) */
+                const imageResponse = await fetch('https://api-flowvix-1brj.vercel.app/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'gemini-2.5-flash-image', // Use Image Model
+                        prompt: generatedPrompt
+                    })
+                });
+
+                /* HANDLE IMAGE RESPONSE */
+                try {
+                    const imgData = await imageResponse.json();
+
+                    /* CHECK FOR STANDARD GEMINI IMAGE OUTPUT (inlineData) */
+                    const candidate = imgData.candidates?.[0];
+                    const parts = candidate?.content?.parts || [];
+
+                    // Find the part that actually contains the image (Model might return text + image)
+                    const imagePart = parts.find(p => p.inlineData && p.inlineData.data);
+
+                    if (imagePart) {
+                        /* Success: Base64 Image */
+                        const mimeType = imagePart.inlineData.mimeType || 'image/png';
+                        imgResult.src = `data:${mimeType};base64,${imagePart.inlineData.data}`;
+                        imgResult.style.display = 'block';
+
+                        /* ADDED: Image Modal (Lightbox) */
+                        imgResult.style.cursor = 'zoom-in';
+                        imgResult.title = "Click para ampliar";
+                        imgResult.onclick = function () {
+                            let modal = document.getElementById('ai-image-modal');
+                            if (!modal) {
+                                modal = document.createElement('div');
+                                modal.id = 'ai-image-modal';
+                                modal.style.position = 'fixed';
+                                modal.style.top = '0';
+                                modal.style.left = '0';
+                                modal.style.width = '100vw';
+                                modal.style.height = '100vh';
+                                modal.style.backgroundColor = 'rgba(0,0,0,0.9)';
+                                modal.style.zIndex = '10000';
+                                modal.style.display = 'flex';
+                                modal.style.justifyContent = 'center';
+                                modal.style.alignItems = 'center';
+                                modal.style.cursor = 'zoom-out';
+                                modal.onclick = function () { this.style.display = 'none'; };
+
+                                const modalImg = document.createElement('img');
+                                modalImg.id = 'ai-modal-img';
+                                modalImg.style.maxHeight = '95vh';
+                                modalImg.style.maxWidth = '95vw';
+                                modalImg.style.borderRadius = '4px';
+                                modalImg.style.boxShadow = '0 0 30px rgba(0,0,0,0.8)';
+                                modal.appendChild(modalImg);
+
+                                document.body.appendChild(modal);
+                            }
+                            document.getElementById('ai-modal-img').src = this.src;
+                            modal.style.display = 'flex';
+                        };
+
+                        /* HIDE ANIMATION */
+                        // if (animContainer) animContainer.style.display = 'none'; // Removed
+
+                        /* SHOW ACTIONS */
+                        // let actionContainer = document.getElementById('ai-action-buttons'); // Removed
+                        // if (!actionContainer) {
+                        //     actionContainer = document.createElement('div');
+                        //     actionContainer.id = 'ai-action-buttons';
+                        //     actionContainer.innerHTML = `
+                        //         <button class="action-btn btn-regen" onclick="runAIProcess()">Regenerar Variante</button>
+                        //         <button class="action-btn btn-reset" onclick="location.reload()">Nuevo Proyecto</button>
+                        //     `;
+                        //     document.getElementById('ai-floorplan-section').appendChild(actionContainer);
+                        // }
+                        // actionContainer.style.display = 'flex'; // Removed
+
+                        // status.innerText = "¡Imagen Generada con Éxito! (Click para ampliar)"; // Removed
+                    }
+                    else if (candidate && candidate.finishReason !== 'STOP') {
+                        /* Safety or other block */
+                        throw new Error(`Generación bloqueada. Razón: ${candidate.finishReason}`);
+                    }
+                    else {
+                        // Check if it's purely text
+                        const textPart = parts.find(p => p.text);
+                        if (textPart) {
+                            throw new Error(`El modelo respondió solo con TEXTO: "${textPart.text.substring(0, 50)}..."\nPrueba 'imagen-3.0' o ignora si esperabas texto.`);
+                        }
+
+                        throw new Error("No se encontraron datos de imagen en la respuesta.");
+                    }
+
+                } catch (parseError) {
+                    console.error("Error parsing image:", parseError);
+                    loader.style.display = 'none';
+                    // imgResult.src = imageUrl; // This `imageUrl` is not defined. Assuming it should be the base64 data from `imagePart` if successful.
+                    // The original code had `imgResult.src = ...` inside the `if (imagePart)` block.
+                    // This line seems to be a misplaced or incomplete part of the instruction.
+                    // I will remove it as it would cause an error.
+                    // imgResult.style.display = 'block'; // This is already handled in the success block.
+
+                    /* Show Action Buttons */
+                    // if(actionBtns) actionBtns.style.display = 'flex'; // This is also handled in the success block.
+                    alert("Error procesando la imagen de la API:\n" + parseError.message);
+                }
+
+                // btn.disabled = false; // Removed
+                /* END PROGRESS SIMULATION */
+                clearInterval(progressInterval);
+                if (progressText) progressText.innerText = "100%";
+
+                /* SHOW RESULTS */
+                loader.style.display = 'none';
+                // imgResult.src is already set in the success block above
+                imgResult.style.display = 'block';
+
+                if (listContainer) {
+                    listContainer.style.display = 'block'; // Show list now
+                }
+
+                /* Show Prompt Box */
+                if (promptBox) {
+                    promptBox.style.display = 'block';
+                    promptBox.style.marginTop = '20px';
+                    promptBox.style.borderTop = '1px solid #eee';
+                }
+
+                /* HIDE SUMMARY STATS ON SUCCESS */
+                if (summaryStats) summaryStats.style.display = 'none';
+
+                /* Show Action Buttons */
+                if (actionBtns) actionBtns.style.display = 'flex';
+
+            } catch (err) {
+                console.error(err);
+                clearInterval(progressInterval);
+                loader.style.display = 'none';
+
+                // Show Initial Box again on error so they can retry
+                if (initialState) initialState.style.display = 'block';
+
+                alert('Hubo un error al generar el plano. Por favor intenta de nuevo.');
+            }
+        }
+
+        /* Initial Render - Execute Immediately */
+        updateUI();
+    });
+</script>
