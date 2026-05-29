@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react';
-import { Maximize2, RotateCcw, Dice5, MousePointer2, Hand, Tag, ZoomIn, ZoomOut, Search, Ruler, DollarSign, Share2, Image as ImageIcon, FileText } from 'lucide-react';
+import { Maximize2, RotateCcw, Dice5, MousePointer2, Hand, Tag, ZoomIn, ZoomOut, Search, Share2, Image as ImageIcon, FileText } from 'lucide-react';
 import { PlacedRoom, RoomType } from '../types';
 import { GRID_SIZE } from '../constants';
 import {
@@ -1731,27 +1731,6 @@ const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ rooms, buildingWidth,
             </g>
           </g>
         </svg>
-      </div>
-
-      <div className="bg-white border-t border-gray-300 p-1 px-4 text-[10px] font-mono text-gray-500 flex justify-between select-none items-center">
-        <div className="flex gap-4">
-        </div>
-
-        {/* New Efficiency Metrics */}
-        <div className="flex gap-4 items-center">
-          {budget && (
-            <>
-              <span className="flex items-center gap-1 border-r border-gray-300 pr-4">
-                <Ruler size={10} className="text-blue-500" /> AREA TOTAL: <b>{Math.ceil(budget.totalM2)} m²</b>
-              </span>
-              <span className="flex items-center gap-1 border-r border-gray-300 pr-4">
-                <DollarSign size={10} className="text-emerald-500" /> INVERSIÓN: <b className="text-emerald-600">{budget.totalPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}</b>
-              </span>
-            </>
-          )}
-          <span title="Ratio of Usable Room Area vs Total Area">EFICIENCIA: <b>{displayEfficiency}%</b></span>
-          <span>{rooms.length} ZONAS DEFINIDAS</span>
-        </div>
       </div>
 
       {children}

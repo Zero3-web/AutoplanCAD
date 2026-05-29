@@ -272,10 +272,9 @@
         }
 
         .results-layout-wrapper>div:first-child {
-            height: 600px !important;
-            /* Increased height to show bottom controls */
-            margin-bottom: 60px;
-            /* Increased margin to prevent overlap with sidebar */
+            height: 480px !important;
+            /* Compact height for premium mobile fit since bottom metrics are removed */
+            margin-bottom: 20px;
         }
 
         #results-sidebar {
@@ -287,8 +286,8 @@
             background: transparent !important;
             /* Remove card bg on mobile for cleaner look */
             border: none !important;
-            margin-top: 40px !important;
-            /* Force separation from plan footer */
+            margin-top: 10px !important;
+            /* Brought closer to the plan since duplicate footer is gone */
         }
 
         /* Minimalist Summary List on Mobile */
@@ -1260,9 +1259,14 @@
         if (currentStep < 0) currentStep = 0;
         if (currentStep >= totalSteps) currentStep = totalSteps - 1;
 
-        // Auto-scroll to top on mobile when changing steps
+        // Auto-scroll to wizard container on mobile when changing steps
         if (window.innerWidth <= 900) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const container = document.getElementById('aprime-wizard-container');
+            if (container) {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
         updateUI();
@@ -1334,9 +1338,14 @@
     }
 
     async function generateLayout() {
-        // Auto-scroll to top on mobile when generating layout
+        // Auto-scroll to wizard container on mobile when generating layout
         if (window.innerWidth <= 900) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const container = document.getElementById('aprime-wizard-container');
+            if (container) {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
         const resultContainer = document.getElementById('result-frame-container');
