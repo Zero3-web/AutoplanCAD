@@ -18,6 +18,16 @@ const AppTour: React.FC<AppTourProps> = ({ steps, onComplete, isOpen }) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -76,6 +86,15 @@ const AppTour: React.FC<AppTourProps> = ({ steps, onComplete, isOpen }) => {
 
     // Tooltip positioning
     const getTooltipPosition = () => {
+        if (isMobile) {
+            return {
+                bottom: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                top: 'auto'
+            };
+        }
+
         if (!targetRect) return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
 
         const padding = 15;
@@ -106,7 +125,7 @@ const AppTour: React.FC<AppTourProps> = ({ steps, onComplete, isOpen }) => {
             {/* Tooltip */}
             <div
                 ref={tooltipRef}
-                className="absolute w-72 bg-white rounded-2xl shadow-2xl p-5 border border-slate-100 flex flex-col gap-3 transition-all duration-300 animate-in fade-in zoom-in duration-300"
+                className="absolute w-72 max-w-[calc(100vw-32px)] bg-white rounded-2xl shadow-2xl p-5 border border-slate-100 flex flex-col gap-3 transition-all duration-300 animate-in fade-in zoom-in duration-300"
                 style={getTooltipPosition()}
             >
                 <button
@@ -143,7 +162,7 @@ const AppTour: React.FC<AppTourProps> = ({ steps, onComplete, isOpen }) => {
                 </div>
 
                 {/* Pointer Arrow */}
-                {targetRect && step.position !== 'center' && (
+                {!isMobile && targetRect && step.position !== 'center' && (
                     <div
                         className={`absolute w-3 h-3 bg-white border-slate-100 transform rotate-45 ${step.position === 'left' ? 'right-[-6px] top-1/2 -translate-y-1/2 border-t border-r' :
                                 step.position === 'right' ? 'left-[-6px] top-1/2 -translate-y-1/2 border-b border-l' :
