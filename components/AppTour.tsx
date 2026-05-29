@@ -22,7 +22,7 @@ const AppTour: React.FC<AppTourProps> = ({ steps, onComplete, isOpen }) => {
 
     useEffect(() => {
         const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 768);
+            setIsMobile(window.innerWidth <= 900);
         };
         checkMobile();
         window.addEventListener('resize', checkMobile);
