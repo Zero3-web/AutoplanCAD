@@ -116,6 +116,23 @@ const AppTour: React.FC<AppTourProps> = ({ steps, onComplete, isOpen }) => {
 
     return (
         <div className="fixed inset-0 z-[10000] overflow-hidden">
+            <style>{`
+                @media (max-width: 900px) {
+                    .tour-tooltip-card {
+                        position: fixed !important;
+                        bottom: 20px !important;
+                        left: 50% !important;
+                        transform: translate(-50%, 0) !important;
+                        top: auto !important;
+                        right: auto !important;
+                        max-width: calc(100vw - 32px) !important;
+                    }
+                    .tour-pointer-arrow {
+                        display: none !important;
+                    }
+                }
+            `}</style>
+
             {/* Background Dimmer */}
             <div
                 className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-all duration-500"
@@ -125,7 +142,7 @@ const AppTour: React.FC<AppTourProps> = ({ steps, onComplete, isOpen }) => {
             {/* Tooltip */}
             <div
                 ref={tooltipRef}
-                className="absolute w-72 max-w-[calc(100vw-32px)] bg-white rounded-2xl shadow-2xl p-5 border border-slate-100 flex flex-col gap-3 transition-all duration-300 animate-in fade-in zoom-in duration-300"
+                className="tour-tooltip-card absolute w-72 max-w-[calc(100vw-32px)] bg-white rounded-2xl shadow-2xl p-5 border border-slate-100 flex flex-col gap-3 transition-all duration-300 animate-in fade-in zoom-in duration-300"
                 style={getTooltipPosition()}
             >
                 <button
@@ -164,11 +181,13 @@ const AppTour: React.FC<AppTourProps> = ({ steps, onComplete, isOpen }) => {
                 {/* Pointer Arrow */}
                 {!isMobile && targetRect && step.position !== 'center' && (
                     <div
-                        className={`absolute w-3 h-3 bg-white border-slate-100 transform rotate-45 ${step.position === 'left' ? 'right-[-6px] top-1/2 -translate-y-1/2 border-t border-r' :
-                                step.position === 'right' ? 'left-[-6px] top-1/2 -translate-y-1/2 border-b border-l' :
-                                    step.position === 'top' ? 'bottom-[-6px] left-1/2 -translate-x-1/2 border-b border-r' :
-                                        'top-[-6px] left-1/2 -translate-x-1/2 border-t border-l'
-                            }`}
+                        className="tour-pointer-arrow absolute w-3 h-3 bg-white border-slate-100 transform rotate-45"
+                        style={
+                            step.position === 'left' ? { right: '-6px', top: '50%', transform: 'translateY(-50%) rotate(45deg)', borderTop: '1px solid #f1f5f9', borderRight: '1px solid #f1f5f9' } :
+                            step.position === 'right' ? { left: '-6px', top: '50%', transform: 'translateY(-50%) rotate(45deg)', borderBottom: '1px solid #f1f5f9', borderLeft: '1px solid #f1f5f9' } :
+                            step.position === 'top' ? { bottom: '-6px', left: '50%', transform: 'translateX(-50%) rotate(45deg)', borderBottom: '1px solid #f1f5f9', borderRight: '1px solid #f1f5f9' } :
+                            { top: '-6px', left: '50%', transform: 'translateX(-50%) rotate(45deg)', borderTop: '1px solid #f1f5f9', borderLeft: '1px solid #f1f5f9' }
+                        }
                     />
                 )}
             </div>
